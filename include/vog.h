@@ -1,0 +1,203 @@
+#pragma once
+
+// vog — GLFW + Dear ImGui windowing library, v0.3.0
+//
+// Single include for everything. ImGui is included automatically so callers
+// only need: #include "vog.h"
+
+#include <atomic>
+#include <functional>
+#include <thread>
+
+#include "IconsFontAwesome6.h"
+#include "imgui.h"
+
+struct GLFWwindow;
+
+// ---------------------------------------------------------------------------
+// vog — window management and theming
+// ---------------------------------------------------------------------------
+namespace vog {
+
+// Semantic color tokens for the UI theme.
+// Fill a ThemeColors and pass it to SetThemeColors() to apply a custom palette.
+struct ThemeColors {
+    // Backgrounds
+    ImVec4 bg;        // app / window background
+    ImVec4 surface;   // elevated surface: panels, popups, child windows
+    ImVec4 titlebar;  // titlebar and menubar background
+
+    // Interactive element states
+    ImVec4 element;         // resting / default state
+    ImVec4 element_hover;   // pointer over
+    ImVec4 element_active;  // pressed or confirmed-active (e.g. active tab)
+
+    // Borders
+    ImVec4 border;         // primary borders and dividers
+    ImVec4 border_subtle;  // inner / light borders (table cell lines, etc.)
+    ImVec4 border_shadow;  // drop-shadow tint (transparent in most themes)
+
+    // Text
+    ImVec4 text;        // primary readable text
+    ImVec4 text_muted;  // secondary, disabled, or hint text
+
+    // Accent (brand / interactive color)
+    ImVec4 accent;         // focus rings, nav highlight, slider grab
+    ImVec4 accent_hover;   // accent on hover
+    ImVec4 accent_active;  // accent on press or hold
+    ImVec4 selection;      // text-selection highlight (translucent accent)
+
+    // Status
+    ImVec4 positive;  // success, ok, checkmarks
+    ImVec4 warning;   // caution, drag-drop target
+    ImVec4 danger;    // errors, critical status, delete actions
+
+    // Overlays
+    ImVec4 dim;      // modal / full-screen dim scrim
+    ImVec4 nav_dim;  // Ctrl+Tab nav-windowing background dim
+};
+
+// Returns a reference to the active ThemeColors.
+// Valid after Window::Start() has been called.
+ThemeColors& GetThemeColors();
+
+// Override the active theme with a user-supplied palette and re-apply styling.
+// Must be called after Window::Start() has been called (ImGui context exists).
+void SetThemeColors(const ThemeColors& colors);
+
+// ---------------------------------------------------------------------------
+// Window
+// ---------------------------------------------------------------------------
+
+struct WindowConfig {
+    const char* title = "App";
+    int width = 1280;
+    int height = 720;
+};
+
+// Self-contained windowing + ImGui lifecycle.
+//
+// Call Start() to open the window and begin rendering. The render_frame
+// callback is invoked once per frame between ImGui::NewFrame() and
+// ImGui::Render(); put all ImGui widget calls there.
+//
+// Threading:
+//   macOS  — Start() runs the render loop on the calling thread and blocks
+//             until the window is closed or Stop() is called.  The calling
+//             thread must be the main thread.
+//   Others — Start() spawns a background thread and returns immediately.
+class Window {
+   public:
+    Window() = default;
+    ~Window();  // calls Stop() if still running
+
+    // Open the window and start rendering. Returns false on init failure.
+    bool Start(const WindowConfig& config, std::function<void()> render_frame);
+
+    // Signal the render loop to exit and join the thread (if any).
+    void Stop();
+
+    // Block until the window is closed. On macOS, Start() already blocks so
+    // this is a no-op. On Windows/Linux, Start() returns immediately and
+    // Wait() joins the background render thread — use this instead of a
+    // manual platform-specific loop.
+    void Wait();
+
+    bool IsRunning() const { return running_.load(); }
+
+    // Escape hatch: the raw GLFW window pointer (nullptr if not running).
+    GLFWwindow* GetNativeWindow() const { return window_; }
+
+   private:
+    bool InitializeGraphics(const WindowConfig& config);
+    void CleanupGraphics();
+    void RenderLoop(const WindowConfig& config, std::function<void()> render_frame);
+
+    GLFWwindow* window_ = nullptr;
+    std::atomic<bool> running_{false};
+    std::atomic<bool> should_stop_{false};
+    std::thread render_thread_;
+};
+
+// ---------------------------------------------------------------------------
+// vog::widgets — custom widget helpers (inline, built on top of ImGui)
+// ---------------------------------------------------------------------------
+namespace widgets {
+
+// Fixed-position tooltip shown below the last item after a short delay.
+inline void ShowItemTooltip(const char* text) {
+    if (ImGui::IsItemHovered(ImGuiHoveredFlags_DelayNormal | ImGuiHoveredFlags_NoSharedDelay)) {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.0f, 6.0f));
+        ImVec2 item_br = ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y + 4.0f);
+        ImGui::SetNextWindowPos(item_br, ImGuiCond_Always);
+        if (ImGui::BeginTooltip()) {
+            ImGui::TextUnformatted(text);
+            ImGui::EndTooltip();
+        }
+        ImGui::PopStyleVar();
+    }
+}
+
+// ImGui::Combo with vertical padding added to the dropdown popup.
+inline bool Combo(const char* label, int* current_item, const char* const items[], int items_count) {
+    ImGuiStyle& style = ImGui::GetStyle();
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(style.FramePadding.x, 6.0f));
+    bool ret = ImGui::Combo(label, current_item, items, items_count);
+    ImGui::PopStyleVar();
+    return ret;
+}
+
+// On/off toggle switch. Returns true when the value changes.
+// labelOnRight=false draws the label to the left of the track.
+inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+
+    if (!labelOnRight) {
+        ImGui::TextUnformatted(label);
+        ImGui::SameLine();
+    }
+
+    ImVec2 pos = ImGui::GetCursorScreenPos();
+
+    const float h = ImGui::GetFrameHeight();
+    const float w = h * 1.8f;
+    const float r = h * 0.5f;
+    const float knob_r = h * 0.40f;
+
+    ImGui::InvisibleButton(label, {w, h});
+
+    bool changed = false;
+    if (ImGui::IsItemClicked()) {
+        *v = !*v;
+        changed = true;
+    }
+
+    const bool hovered = ImGui::IsItemHovered();
+    const ThemeColors& tc = GetThemeColors();
+
+    ImVec4 col_on = hovered ? tc.accent_hover : tc.accent;
+    ImVec4 col_off = hovered ? tc.element_hover : tc.element_active;
+
+    ImU32 col_bg = ImGui::GetColorU32(*v ? col_on : col_off);
+    ImU32 col_knob = ImGui::GetColorU32(ImVec4(1.f, 1.f, 1.f, 1.f));
+    ImU32 col_border = ImGui::GetColorU32(*v ? ImVec4(0.0f, 0.0f, 0.0f, 0.0f) : tc.border);
+
+    ImVec2 p_max = {pos.x + w, pos.y + h};
+    dl->AddRectFilled(pos, p_max, col_bg, r);
+    dl->AddRect(pos, p_max, col_border, r, 0, 1.5f);
+
+    float knob_x = *v ? (pos.x + w - r) : (pos.x + r);
+    ImVec2 knob_center = {knob_x, pos.y + h * 0.5f};
+    dl->AddCircleFilled(knob_center, knob_r, col_knob);
+    dl->AddCircle(knob_center, knob_r, IM_COL32(0, 0, 0, 100), 0, 1.f);
+
+    if (labelOnRight) {
+        ImGui::SameLine();
+        ImGui::TextUnformatted(label);
+    }
+
+    return changed;
+}
+
+}  // namespace widgets
+}  // namespace vog
