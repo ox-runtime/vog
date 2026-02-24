@@ -1,17 +1,24 @@
 # vog
 
-A batteries-included C++ windowing library built on [GLFW](https://www.glfw.org/) and [Dear ImGui](https://github.com/ocornut/imgui). It handles window-creation, screen-aware DPI and font scaling, system dark mode detection, native titlebar appearance, and a bunch of platform-dependent implementation details. It also provides Font Awesome icons and a couple of useful ImGui widgets suitable for applications.
+**vog** is a batteries-included C++ windowing library built on [GLFW](https://www.glfw.org/) and [Dear ImGui](https://github.com/ocornut/imgui). It handles window-creation, DPI-aware font scaling, system dark mode detection, native titlebar appearance, and other platform-dependent details. It also bundles Font Awesome 6 icons and a couple of useful ImGui widgets suitable for applications.
 
-This lets you focus on drawing the contents of your window, without having to deal with platform-specific details. Supports Windows, Linux and macOS.
+This allows you to focus entirely on drawing the contents of your window. Supports Windows, Linux and macOS.
 
-Primarily built for [ox-simulator](https://github.com/ox-runtime/ox-simulator), but you're free to use it if you find it useful!
+Primarily built for [ox-simulator](https://github.com/ox-runtime/ox-simulator), but feel free to use it if you find it useful!
 
 ## Usage
 
-Add the library as a CMake subdirectory, then link against it:
+Fetch the library in CMake, then link against it:
 
 ```cmake
-add_subdirectory(third_party/vog)
+include(FetchContent)
+
+FetchContent_Declare(vog
+    GIT_REPOSITORY https://github.com/ox-runtime/vog.git
+    GIT_TAG main  # Replace with a specific tag or branch if needed
+)
+FetchContent_MakeAvailable(vog)
+
 target_link_libraries(your_target PRIVATE vog)
 ```
 
@@ -41,7 +48,7 @@ window.Wait();
 
 `GetThemeColors()` returns a reference to the active `ThemeColors` instance. A dark/light theme is chosen automatically based on the OS dark/light mode setting when the window opens, but you can set a custom theme as well (see below).
 
-## Custom theme colors
+### Custom theme colors
 
 Supply a fully populated `ThemeColors` to `SetThemeColors()` at any point after `Window::Start()` has been called:
 
