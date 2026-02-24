@@ -6,6 +6,10 @@ This allows you to focus entirely on drawing the contents of your window. Suppor
 
 Primarily built for [ox-simulator](https://github.com/ox-runtime/ox-simulator), but feel free to use it if you find it useful!
 
+<img  height="300" alt="vog dark on Windows" src="https://github.com/user-attachments/assets/c24d9678-98b7-4bf0-a730-932491813cb6" />
+<img  height="300" alt="vog light on Windows" src="https://github.com/user-attachments/assets/6de76b1d-90e0-41ac-bacb-0c693eb353b4" />
+
+
 ## Usage
 
 Fetch the library in CMake, then link against it:
