@@ -46,7 +46,7 @@ window.Wait();
 
 ## Theme colors
 
-`GetThemeColors()` returns a reference to the active `ThemeColors` instance. A dark/light theme is chosen automatically based on the OS dark/light mode setting when the window opens, but you can set a custom theme as well (see below).
+`GetThemeColors()` returns a reference to the active [ThemeColors](include/vog.h) instance. A dark/light theme is chosen automatically based on the OS dark/light mode setting when the window opens, but you can set a custom theme as well (see below).
 
 ### Custom theme colors
 
