@@ -15,7 +15,7 @@ include(FetchContent)
 
 FetchContent_Declare(vog
     GIT_REPOSITORY https://github.com/ox-runtime/vog.git
-    GIT_TAG main  # Replace with a specific tag or branch if needed
+    GIT_TAG v1.0.0  # Replace with a specific tag or branch if needed
 )
 FetchContent_MakeAvailable(vog)
 
