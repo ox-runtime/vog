@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <thread>
 
@@ -144,15 +145,31 @@ void Window::RenderLoop(const WindowConfig& config, std::function<void()> render
 
     ImGuiIO& io = ImGui::GetIO();
 
+    float last_content_scale = 0.0f;
+    {
+        float xs, ys;
+        glfwGetWindowContentScale(window_, &xs, &ys);
+        last_content_scale = (xs + ys) * 0.5f;
+    }
+
     while (!should_stop_.load() && !glfwWindowShouldClose(window_)) {
         glfwPollEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
+        // Rebuild the font atlas if the content scale changed (window moved
+        // to a display with a different DPI).
+        float xs, ys;
+        glfwGetWindowContentScale(window_, &xs, &ys);
+        float current_content_scale = (xs + ys) * 0.5f;
+        if (std::abs(current_content_scale - last_content_scale) > 0.01f) {
+            last_content_scale = current_content_scale;
+            io.Fonts->Clear();
+            setup_fonts(io, window_);
+            ImGui_ImplOpenGL3_CreateFontsTexture();
+        }
+
         int display_w, display_h;
         glfwGetFramebufferSize(window_, &display_w, &display_h);
-        float xscale, yscale;
-        glfwGetWindowContentScale(window_, &xscale, &yscale);
-        io.FontGlobalScale = 1.0f / ((xscale + yscale) * 0.5f);
 
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

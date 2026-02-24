@@ -13,7 +13,7 @@
 
 namespace vog {
 
-const float GLOBAL_FONT_SIZE = 17.0f;
+const float GLOBAL_FONT_SIZE = 14.0f;
 
 // Returns a platform-appropriate Arial-like font path.
 inline std::string GetFontPath() {
@@ -61,7 +61,6 @@ inline void setup_fonts(ImGuiIO& io, GLFWwindow* window) {
 
     if (default_font) {
         io.FontDefault = default_font;
-        io.FontGlobalScale = 1.0f / fontScale;
     } else {
         io.FontDefault = io.Fonts->AddFontDefault();
     }
