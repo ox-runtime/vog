@@ -153,6 +153,7 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     ImDrawList* dl = ImGui::GetWindowDrawList();
 
     if (!labelOnRight) {
+        ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(label);
         ImGui::SameLine();
     }
@@ -193,6 +194,7 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
 
     if (labelOnRight) {
         ImGui::SameLine();
+        ImGui::AlignTextToFramePadding();
         ImGui::TextUnformatted(label);
     }
 
