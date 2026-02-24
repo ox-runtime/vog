@@ -80,7 +80,7 @@ static void RenderFrame(DemoState& s) {
     ImGui::SetNextWindowSize(io.DisplaySize);
     ImGuiWindowFlags host_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
                                   ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBringToFrontOnFocus;
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
     ImGui::Begin("##host", nullptr, host_flags);
     ImGui::PopStyleVar();
 
