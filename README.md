@@ -48,6 +48,8 @@ window.Wait();
 
 `GetThemeColors()` returns a reference to the active [ThemeColors](include/vog.h) instance. A dark/light theme is chosen automatically based on the OS dark/light mode setting when the window opens, but you can set a custom theme as well (see below).
 
+**Note:** Dark mode detection on Linux needs more work. Please feel free to [contribute](src/platform_linux.cpp)!
+
 ### Custom theme colors
 
 Supply a fully populated `ThemeColors` to `SetThemeColors()` at any point after `Window::Start()` has been called:
