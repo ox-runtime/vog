@@ -108,6 +108,8 @@ class Window {
     // Escape hatch: the raw GLFW window pointer (nullptr if not running).
     GLFWwindow* GetNativeWindow() const { return window_; }
 
+    void RenderFrameNow();
+
    private:
     bool InitializeGraphics(const WindowConfig& config);
     void CleanupGraphics();
@@ -117,6 +119,7 @@ class Window {
     std::atomic<bool> running_{false};
     std::atomic<bool> should_stop_{false};
     std::thread render_thread_;
+    std::function<void()> active_render_frame_;
 };
 
 // ---------------------------------------------------------------------------

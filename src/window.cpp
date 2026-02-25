@@ -137,11 +137,46 @@ void Window::CleanupGraphics() {
     }
 }
 
+void Window::RenderFrameNow() {
+    if (!active_render_frame_ || !window_) return;
+
+    int display_w, display_h;
+    glfwGetFramebufferSize(window_, &display_w, &display_h);
+    if (display_w == 0 || display_h == 0) return;
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    active_render_frame_();
+
+    ImGui::Render();
+
+    const ThemeColors& tc = GetThemeColors();
+    glViewport(0, 0, display_w, display_h);
+    glClearColor(tc.bg.x, tc.bg.y, tc.bg.z, tc.bg.w);
+    glClear(GL_COLOR_BUFFER_BIT);
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    glfwSwapBuffers(window_);
+}
+
 void Window::RenderLoop(const WindowConfig& config, std::function<void()> render_frame) {
     if (!InitializeGraphics(config)) {
         running_.store(false);
         return;
     }
+
+    // Store for use in resize/refresh callbacks
+    active_render_frame_ = render_frame;
+
+    // Re-render immediately during window resize/refresh for live layout updates.
+    // On Windows the OS enters a modal resize loop inside glfwPollEvents(), and
+    // these callbacks fire on the same thread, so it is safe to call RenderFrameNow().
+    glfwSetWindowUserPointer(window_, this);
+    glfwSetFramebufferSizeCallback(window_, [](GLFWwindow* w, int, int) {
+        auto* self = static_cast<Window*>(glfwGetWindowUserPointer(w));
+        if (self) self->RenderFrameNow();
+    });
 
     ImGuiIO& io = ImGui::GetIO();
 
@@ -168,23 +203,7 @@ void Window::RenderLoop(const WindowConfig& config, std::function<void()> render
             ImGui_ImplOpenGL3_CreateFontsTexture();
         }
 
-        int display_w, display_h;
-        glfwGetFramebufferSize(window_, &display_w, &display_h);
-
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        render_frame();
-
-        ImGui::Render();
-
-        const ThemeColors& tc = GetThemeColors();
-        glViewport(0, 0, display_w, display_h);
-        glClearColor(tc.bg.x, tc.bg.y, tc.bg.z, tc.bg.w);
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-        glfwSwapBuffers(window_);
+        RenderFrameNow();
     }
 
     CleanupGraphics();
