@@ -53,9 +53,9 @@ static void fill_light_palette(ThemeColors& c) {
     c.text = ImVec4(0.15f, 0.15f, 0.18f, 1.0f);        // #26262E
     c.text_muted = ImVec4(0.45f, 0.45f, 0.48f, 1.0f);  // #73737A
 
-    c.accent = ImVec4(0.20f, 0.50f, 0.88f, 1.0f);         // #3380E0
-    c.accent_hover = ImVec4(0.28f, 0.58f, 0.92f, 1.0f);   // #4994EB
-    c.accent_active = ImVec4(0.15f, 0.42f, 0.80f, 1.0f);  // #276BCC
+    c.accent = ImVec4(0.28f, 0.58f, 0.92f, 1.0f);         // #4994EB
+    c.accent_hover = ImVec4(0.36f, 0.66f, 0.96f, 1.0f);   // #5BA8F5
+    c.accent_active = ImVec4(0.24f, 0.50f, 0.88f, 1.0f);  // #3D80E0
     c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);     // #3380E059
 
     c.positive = ImVec4(0.28f, 0.68f, 0.35f, 1.0f);  // #47AD59
