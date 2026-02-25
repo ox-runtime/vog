@@ -119,22 +119,15 @@ static void RenderFrame(DemoState& s) {
 
             ImGui::Spacing();
             ImGui::SeparatorText("Buttons");
-            if (ImGui::Button("Normal")) {
+            if (vog::widgets::Button("Normal")) {
             }
             ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_Button, tc.accent);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, tc.accent_hover);
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, tc.accent_active);
-            if (ImGui::Button("Accent")) {
+            if (vog::widgets::Button("Accent", tc.accent)) {
             }
-            ImGui::PopStyleColor(3);
+
             ImGui::SameLine();
-            ImGui::PushStyleColor(ImGuiCol_Button, tc.danger);
-            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(tc.danger.x + 0.1f, tc.danger.y, tc.danger.z, 1));
-            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(tc.danger.x - 0.1f, tc.danger.y, tc.danger.z, 1));
-            if (ImGui::Button("Danger")) {
+            if (vog::widgets::Button("Danger", tc.danger)) {
             }
-            ImGui::PopStyleColor(3);
 
             ImGui::EndTabItem();
         }

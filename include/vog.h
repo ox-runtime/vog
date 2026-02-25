@@ -210,5 +210,42 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     return changed;
 }
 
+// Function to calculate tinted text color based on background color
+inline ImVec4 CalculateTintedTextColor(const ImVec4& bg, const float textTintStrength = 0.15f) {
+    // Calculate relative luminance
+    float luminance = 0.2126f * bg.x + 0.7152f * bg.y + 0.0722f * bg.z;
+    bool isDark = luminance < 0.5f;
+    // Base text color: white for dark backgrounds, black for light backgrounds
+    ImVec4 baseColor = isDark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+    // Add a slight tint based on the background color
+    float t = textTintStrength * (isDark ? 0.5f : 1.0f);
+    float t_inv = 1.0f - t;
+    return ImVec4(baseColor.x * t_inv + bg.x * t, baseColor.y * t_inv + bg.y * t, baseColor.z * t_inv + bg.z * t, 1.0f);
+}
+
+// Widget for a button with dynamic text coloring based on background color
+inline bool Button(const char* label, const ImVec4& bgColor) {
+    // Calculate hover and active colors by modifying the background color
+    ImVec4 hoverColor = ImVec4(std::min(bgColor.x + 0.05f, 1.0f), std::min(bgColor.y + 0.05f, 1.0f),
+                               std::min(bgColor.z + 0.05f, 1.0f), bgColor.w);
+    ImVec4 activeColor = ImVec4(std::max(bgColor.x - 0.1f, 0.0f), std::max(bgColor.y - 0.1f, 0.0f),
+                                std::max(bgColor.z - 0.1f, 0.0f), bgColor.w);
+
+    ImVec4 textColor = CalculateTintedTextColor(bgColor);
+    ImGui::PushStyleColor(ImGuiCol_Text, textColor);
+    ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoverColor);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, activeColor);
+    bool clicked = ImGui::Button(label);
+    ImGui::PopStyleColor(4);
+    return clicked;
+}
+
+inline bool Button(const char* label) {
+    // use default element colors from the theme
+    const ThemeColors& tc = GetThemeColors();
+    return Button(label, tc.element);
+}
+
 }  // namespace widgets
 }  // namespace vog
