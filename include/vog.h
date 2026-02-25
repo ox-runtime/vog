@@ -181,10 +181,12 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
 
     ImVec4 col_on = hovered ? tc.accent_hover : tc.accent;
     ImVec4 col_off = hovered ? tc.element_hover : tc.element_active;
+    ImVec4 b = tc.border;
 
     ImU32 col_bg = ImGui::GetColorU32(*v ? col_on : col_off);
-    ImU32 col_knob = ImGui::GetColorU32(ImVec4(1.f, 1.f, 1.f, 1.f));
     ImU32 col_border = ImGui::GetColorU32(*v ? ImVec4(0.0f, 0.0f, 0.0f, 0.0f) : tc.border);
+    ImU32 col_knob = ImGui::GetColorU32(ImVec4(1.f, 1.f, 1.f, 1.f));
+    ImU32 col_knob_border = ImGui::GetColorU32(*v ? ImVec4(b.x, b.y, b.z, 0.55f) : ImVec4(b.x, b.y, b.z, 0.8f));
 
     ImVec2 p_max = {pos.x + w, pos.y + h};
     dl->AddRectFilled(pos, p_max, col_bg, r);
@@ -193,7 +195,7 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     float knob_x = *v ? (pos.x + w - r) : (pos.x + r);
     ImVec2 knob_center = {knob_x, pos.y + h * 0.5f};
     dl->AddCircleFilled(knob_center, knob_r, col_knob, 32);
-    dl->AddCircle(knob_center, knob_r, IM_COL32(0, 0, 0, 100), 32, 1.f);
+    dl->AddCircle(knob_center, knob_r, col_knob_border, 32, 1.5f);
 
     if (labelOnRight) {
         ImGui::SameLine();
