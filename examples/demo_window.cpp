@@ -40,16 +40,12 @@ static vog::ThemeColors make_custom_theme() {
     c.surface = ImVec4(0.10f, 0.11f, 0.20f, 1.0f);
     c.titlebar = ImVec4(0.08f, 0.09f, 0.17f, 1.0f);
     c.element = ImVec4(0.18f, 0.20f, 0.35f, 1.0f);
-    c.element_hover = ImVec4(0.24f, 0.27f, 0.44f, 1.0f);
-    c.element_active = ImVec4(0.30f, 0.34f, 0.55f, 1.0f);
     c.border = ImVec4(0.28f, 0.31f, 0.52f, 1.0f);
     c.border_subtle = ImVec4(0.14f, 0.15f, 0.27f, 1.0f);
     c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     c.text = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
     c.text_muted = ImVec4(0.55f, 0.58f, 0.80f, 1.0f);
     c.accent = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
-    c.accent_hover = ImVec4(0.65f, 0.50f, 1.00f, 1.0f);
-    c.accent_active = ImVec4(0.44f, 0.28f, 0.84f, 1.0f);
     c.selection = ImVec4(0.56f, 0.40f, 0.96f, 0.35f);
     c.positive = ImVec4(0.35f, 0.85f, 0.60f, 1.0f);
     c.warning = ImVec4(0.98f, 0.76f, 0.26f, 1.0f);
@@ -223,14 +219,10 @@ static void RenderFrame(DemoState& s) {
                 {"surface", tc.surface},
                 {"titlebar", tc.titlebar},
                 {"element", tc.element},
-                {"element_hover", tc.element_hover},
-                {"element_active", tc.element_active},
                 {"border", tc.border},
                 {"text", tc.text},
                 {"text_muted", tc.text_muted},
                 {"accent", tc.accent},
-                {"accent_hover", tc.accent_hover},
-                {"accent_active", tc.accent_active},
                 {"selection", tc.selection},
                 {"positive", tc.positive},
                 {"warning", tc.warning},

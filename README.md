@@ -63,8 +63,6 @@ my_theme.bg             = ImVec4(0.05f, 0.05f, 0.10f, 1.0f);  // RGBA
 my_theme.surface        = ImVec4(0.09f, 0.09f, 0.16f, 1.0f);
 my_theme.text           = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
 my_theme.accent         = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
-my_theme.accent_hover   = ImVec4(0.65f, 0.50f, 1.00f, 1.0f);
-my_theme.accent_active  = ImVec4(0.44f, 0.28f, 0.84f, 1.0f);
 // ... fill the remaining fields ...
 
 vog::SetThemeColors(my_theme);

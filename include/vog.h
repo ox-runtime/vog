@@ -28,9 +28,7 @@ struct ThemeColors {
     ImVec4 titlebar;  // titlebar and menubar background
 
     // Interactive element states
-    ImVec4 element;         // resting / default state
-    ImVec4 element_hover;   // pointer over
-    ImVec4 element_active;  // pressed or confirmed-active (e.g. active tab)
+    ImVec4 element;  // default state of input elements
 
     // Borders
     ImVec4 border;         // primary borders and dividers
@@ -42,10 +40,8 @@ struct ThemeColors {
     ImVec4 text_muted;  // secondary, disabled, or hint text
 
     // Accent (brand / interactive color)
-    ImVec4 accent;         // focus rings, nav highlight, slider grab
-    ImVec4 accent_hover;   // accent on hover
-    ImVec4 accent_active;  // accent on press or hold
-    ImVec4 selection;      // text-selection highlight (translucent accent)
+    ImVec4 accent;     // focus rings, nav highlight, slider grab
+    ImVec4 selection;  // text-selection highlight (translucent accent)
 
     // Status
     ImVec4 positive;  // success, ok, checkmarks
@@ -55,6 +51,28 @@ struct ThemeColors {
     // Overlays
     ImVec4 dim;      // modal / full-screen dim scrim
     ImVec4 nav_dim;  // Ctrl+Tab nav-windowing background dim
+
+   private:
+    static ImVec4 adjust_brightness(const ImVec4& color, const ImVec4& bg, float amount) {
+        amount *= is_dark_color(bg) ? -1 : 1;
+        return ImVec4(std::min(color.x + amount, 1.0f), std::min(color.y + amount, 1.0f),
+                      std::min(color.z + amount, 1.0f), color.w);
+    }
+
+   public:
+    static bool is_dark_color(const ImVec4& color) {
+        float luminance = 0.2126f * color.x + 0.7152f * color.y + 0.0722f * color.z;
+        bool isDark = luminance < 0.5f;
+        return isDark;
+    }
+
+    static ImVec4 get_hover_color(const ImVec4& color, const ImVec4& bg) { return adjust_brightness(color, bg, 0.05f); }
+    static ImVec4 get_active_color(const ImVec4& color, const ImVec4& bg) {
+        return adjust_brightness(color, bg, -0.1f);
+    }
+
+    ImVec4 get_hover_color(const ImVec4& color) { return ThemeColors::get_hover_color(color, bg); }
+    ImVec4 get_active_color(const ImVec4& color) { return ThemeColors::get_active_color(color, bg); }
 };
 
 // Returns a reference to the active ThemeColors.
@@ -181,10 +199,10 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     }
 
     const bool hovered = ImGui::IsItemHovered();
-    const ThemeColors& tc = GetThemeColors();
+    ThemeColors& tc = GetThemeColors();
 
-    ImVec4 col_on = hovered ? tc.accent_hover : tc.accent;
-    ImVec4 col_off = hovered ? tc.element_hover : tc.element_active;
+    ImVec4 col_on = hovered ? tc.get_hover_color(tc.accent) : tc.accent;
+    ImVec4 col_off = hovered ? tc.element : tc.get_active_color(tc.element);
     ImVec4 b = tc.border;
 
     ImU32 col_bg = ImGui::GetColorU32(*v ? col_on : col_off);
@@ -212,10 +230,8 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
 
 // Function to calculate tinted text color based on background color
 inline ImVec4 CalculateTintedTextColor(const ImVec4& bg, const float textTintStrength = 0.15f) {
-    // Calculate relative luminance
-    float luminance = 0.2126f * bg.x + 0.7152f * bg.y + 0.0722f * bg.z;
-    bool isDark = luminance < 0.5f;
     // Base text color: white for dark backgrounds, black for light backgrounds
+    bool isDark = ThemeColors::is_dark_color(bg);
     ImVec4 baseColor = isDark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
     // Add a slight tint based on the background color
     float t = textTintStrength * (isDark ? 0.5f : 1.0f);
@@ -226,10 +242,8 @@ inline ImVec4 CalculateTintedTextColor(const ImVec4& bg, const float textTintStr
 // Widget for a button with dynamic text coloring based on background color
 inline bool Button(const char* label, const ImVec4& bgColor) {
     // Calculate hover and active colors by modifying the background color
-    ImVec4 hoverColor = ImVec4(std::min(bgColor.x + 0.05f, 1.0f), std::min(bgColor.y + 0.05f, 1.0f),
-                               std::min(bgColor.z + 0.05f, 1.0f), bgColor.w);
-    ImVec4 activeColor = ImVec4(std::max(bgColor.x - 0.1f, 0.0f), std::max(bgColor.y - 0.1f, 0.0f),
-                                std::max(bgColor.z - 0.1f, 0.0f), bgColor.w);
+    ImVec4 hoverColor = ThemeColors::get_hover_color(bgColor, bgColor);
+    ImVec4 activeColor = ThemeColors::get_active_color(bgColor, bgColor);
 
     ImVec4 textColor = CalculateTintedTextColor(bgColor);
     ImGui::PushStyleColor(ImGuiCol_Text, textColor);
