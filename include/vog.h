@@ -163,10 +163,14 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
 
     ImVec2 pos = ImGui::GetCursorScreenPos();
 
-    const float h = ImGui::GetFrameHeight();
-    const float w = h * 1.8f;
+    const float frame_h = ImGui::GetFrameHeight();
+    const float h = frame_h * 0.9f;
+    const float w = h * 1.85f;
     const float r = h * 0.5f;
     const float knob_r = h * 0.40f;
+
+    // Adjust vertical position to center the toggle button
+    pos.y += (frame_h - h) * 0.5f;
 
     ImGui::InvisibleButton(label, {w, h});
 
