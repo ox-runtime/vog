@@ -9,61 +9,61 @@ static ThemeColors g_theme_colors;
 // ---- Built-in palettes ----
 
 static void fill_dark_palette(ThemeColors& c) {
-    c.bg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);
-    c.surface = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);
-    c.titlebar = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);
+    c.bg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);        // #141414
+    c.surface = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);   // #0D0D0D
+    c.titlebar = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);  // #262626
 
-    c.element = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
-    c.element_hover = ImVec4(0.29f, 0.29f, 0.29f, 1.0f);
-    c.element_active = ImVec4(0.40f, 0.40f, 0.40f, 1.0f);
+    c.element = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);         // #404040
+    c.element_hover = ImVec4(0.29f, 0.29f, 0.29f, 1.0f);   // #4A4A4A
+    c.element_active = ImVec4(0.40f, 0.40f, 0.40f, 1.0f);  // #666666
 
-    c.border = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);
-    c.border_subtle = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);
-    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    c.border = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);         // #404040
+    c.border_subtle = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);  // #0D0D0D
+    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);     // #00000000
 
-    c.text = ImVec4(0.86f, 0.86f, 0.86f, 1.0f);
-    c.text_muted = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);
+    c.text = ImVec4(0.86f, 0.86f, 0.86f, 1.0f);        // #DBDBDB
+    c.text_muted = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);  // #8C8C8C
 
-    c.accent = ImVec4(0.26f, 0.62f, 0.95f, 1.0f);
-    c.accent_hover = ImVec4(0.30f, 0.68f, 0.98f, 1.0f);
-    c.accent_active = ImVec4(0.18f, 0.52f, 0.88f, 1.0f);
-    c.selection = ImVec4(0.26f, 0.62f, 0.95f, 0.30f);
+    c.accent = ImVec4(0.26f, 0.62f, 0.95f, 1.0f);         // #429DF2
+    c.accent_hover = ImVec4(0.30f, 0.68f, 0.98f, 1.0f);   // #4DB0FA
+    c.accent_active = ImVec4(0.18f, 0.52f, 0.88f, 1.0f);  // #2E84E0
+    c.selection = ImVec4(0.26f, 0.62f, 0.95f, 0.30f);     // #429DF24D
 
-    c.positive = ImVec4(0.40f, 0.74f, 0.40f, 1.0f);
-    c.warning = ImVec4(0.96f, 0.78f, 0.36f, 1.0f);
-    c.danger = ImVec4(0.85f, 0.30f, 0.30f, 1.0f);
+    c.positive = ImVec4(0.40f, 0.74f, 0.40f, 1.0f);  // #66BD66
+    c.warning = ImVec4(0.96f, 0.78f, 0.36f, 1.0f);   // #F5C75C
+    c.danger = ImVec4(0.85f, 0.30f, 0.30f, 1.0f);    // #D94D4D
 
-    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);
-    c.nav_dim = ImVec4(0.8f, 0.8f, 0.8f, 0.20f);
+    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
+    c.nav_dim = ImVec4(0.8f, 0.8f, 0.8f, 0.20f);  // #CCCCCC33
 }
 
 static void fill_light_palette(ThemeColors& c) {
-    c.bg = ImVec4(0.95f, 0.95f, 0.96f, 1.0f);
-    c.surface = ImVec4(0.98f, 0.98f, 0.99f, 1.0f);
-    c.titlebar = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);
+    c.bg = ImVec4(0.95f, 0.95f, 0.96f, 1.0f);        // #F2F2F5
+    c.surface = ImVec4(0.98f, 0.98f, 0.99f, 1.0f);   // #FAFAFC
+    c.titlebar = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);  // #EBEBF0
 
-    c.element = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);
-    c.element_hover = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);
-    c.element_active = ImVec4(0.82f, 0.82f, 0.85f, 1.0f);
+    c.element = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);         // #EBEBF0
+    c.element_hover = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);   // #E0E0E6
+    c.element_active = ImVec4(0.82f, 0.82f, 0.85f, 1.0f);  // #D1D1D9
 
-    c.border = ImVec4(0.75f, 0.75f, 0.78f, 1.0f);
-    c.border_subtle = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);
-    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    c.border = ImVec4(0.75f, 0.75f, 0.78f, 1.0f);         // #BFBFCC
+    c.border_subtle = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);  // #E0E0E6
+    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);     // #00000000
 
-    c.text = ImVec4(0.15f, 0.15f, 0.18f, 1.0f);
-    c.text_muted = ImVec4(0.45f, 0.45f, 0.48f, 1.0f);
+    c.text = ImVec4(0.15f, 0.15f, 0.18f, 1.0f);        // #26262E
+    c.text_muted = ImVec4(0.45f, 0.45f, 0.48f, 1.0f);  // #73737A
 
-    c.accent = ImVec4(0.20f, 0.50f, 0.88f, 1.0f);
-    c.accent_hover = ImVec4(0.28f, 0.58f, 0.92f, 1.0f);
-    c.accent_active = ImVec4(0.15f, 0.42f, 0.80f, 1.0f);
-    c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);
+    c.accent = ImVec4(0.20f, 0.50f, 0.88f, 1.0f);         // #3380E0
+    c.accent_hover = ImVec4(0.28f, 0.58f, 0.92f, 1.0f);   // #4994EB
+    c.accent_active = ImVec4(0.15f, 0.42f, 0.80f, 1.0f);  // #276BCC
+    c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);     // #3380E059
 
-    c.positive = ImVec4(0.28f, 0.68f, 0.35f, 1.0f);
-    c.warning = ImVec4(0.90f, 0.65f, 0.20f, 1.0f);
-    c.danger = ImVec4(0.78f, 0.18f, 0.18f, 1.0f);
+    c.positive = ImVec4(0.28f, 0.68f, 0.35f, 1.0f);  // #47AD59
+    c.warning = ImVec4(0.90f, 0.65f, 0.20f, 1.0f);   // #E5A533
+    c.danger = ImVec4(0.78f, 0.18f, 0.18f, 1.0f);    // #C72E2E
 
-    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);
-    c.nav_dim = ImVec4(0.2f, 0.2f, 0.2f, 0.20f);
+    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
+    c.nav_dim = ImVec4(0.2f, 0.2f, 0.2f, 0.20f);  // #33333333
 }
 
 // ---- Style application ----
