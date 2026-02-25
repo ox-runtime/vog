@@ -188,12 +188,12 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
 
     ImVec2 p_max = {pos.x + w, pos.y + h};
     dl->AddRectFilled(pos, p_max, col_bg, r);
-    dl->AddRect(pos, p_max, col_border, r, 0, 1.5f);
+    dl->AddRect(pos, p_max, col_border, r, 0, 1.f);
 
     float knob_x = *v ? (pos.x + w - r) : (pos.x + r);
     ImVec2 knob_center = {knob_x, pos.y + h * 0.5f};
-    dl->AddCircleFilled(knob_center, knob_r, col_knob);
-    dl->AddCircle(knob_center, knob_r, IM_COL32(0, 0, 0, 100), 0, 1.f);
+    dl->AddCircleFilled(knob_center, knob_r, col_knob, 32);
+    dl->AddCircle(knob_center, knob_r, IM_COL32(0, 0, 0, 100), 32, 1.f);
 
     if (labelOnRight) {
         ImGui::SameLine();
