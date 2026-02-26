@@ -98,7 +98,7 @@ void apply_theme_styling(Theme& theme) {
     colors[ImGuiCol_ScrollbarGrabHovered] = element_hover;
     colors[ImGuiCol_ScrollbarGrabActive] = element_active;
 
-    colors[ImGuiCol_CheckMark] = c.positive.value();
+    colors[ImGuiCol_CheckMark] = c.accent.value();
     colors[ImGuiCol_SliderGrab] = c.accent.value();
     colors[ImGuiCol_SliderGrabActive] = accent_active;
 
