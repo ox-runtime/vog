@@ -70,16 +70,6 @@ static void ColorSwatch(const char* label, ImVec4& col) {
 static void RenderFrame(DemoState& s) {
     s.sim_time += ImGui::GetIO().DeltaTime;
 
-    // Full-viewport host window (no decorations)
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui::SetNextWindowPos({0, 0});
-    ImGui::SetNextWindowSize(io.DisplaySize);
-    ImGuiWindowFlags host_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-                                  ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoBringToFrontOnFocus;
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
-    ImGui::Begin("##host", nullptr, host_flags);
-    ImGui::PopStyleVar();
-
     const vog::ThemeColors& tc = vog::GetThemeColors();
 
     // ---- Tab bar ----
@@ -282,9 +272,7 @@ static void RenderFrame(DemoState& s) {
 
         ImGui::EndTabBar();
     }
-    ImGui::PopStyleVar();  // WindowPadding
-
-    ImGui::End();
+    ImGui::PopStyleVar();  // Tab Bar
 }
 
 // ---------------------------------------------------------------------------
