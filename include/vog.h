@@ -233,7 +233,7 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     ThemeColors& tc = Window::GetTheme().colors;
 
     ImVec4 col_on = hovered ? tc.get_hover_color(tc.accent.value()) : tc.accent.value();
-    ImVec4 col_off = hovered ? tc.element.value() : tc.get_active_color(tc.element.value());
+    ImVec4 col_off = hovered ? tc.get_active_color(tc.element.value()) : tc.get_active_color(tc.bg.value());
     ImVec4 b = tc.border.value();
 
     ImU32 col_bg = ImGui::GetColorU32(*v ? col_on : col_off);

@@ -16,7 +16,7 @@ static ThemeColors get_default_dark_palette() {
     c.panel3 = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);  // #2E2E2E
 
     c.element = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);  // #404040
-    c.border = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);   // #404040
+    c.border = ImVec4(0.22f, 0.22f, 0.22f, 1.0f);   // #383838
 
     c.text = ImVec4(0.86f, 0.86f, 0.86f, 1.0f);        // #DBDBDB
     c.text_muted = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);  // #8C8C8C
@@ -51,7 +51,7 @@ static ThemeColors get_default_light_palette() {
     c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);  // #3380E059
 
     c.positive = ImVec4(0.21f, 0.56f, 0.27f, 1.0f);  // #379046
-    c.warning = ImVec4(0.90f, 0.65f, 0.20f, 1.0f);   // #E5A533
+    c.warning = ImVec4(0.80f, 0.51f, 0.0f, 1.0f);    // #CE8400
     c.danger = ImVec4(0.78f, 0.18f, 0.18f, 1.0f);    // #C72E2E
     c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);         // #00000059
 
@@ -84,7 +84,7 @@ void apply_theme_styling(Theme& theme) {
     colors[ImGuiCol_Border] = c.border.value();
     colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-    colors[ImGuiCol_FrameBg] = c.element.value();
+    colors[ImGuiCol_FrameBg] = c.bg.value();
     colors[ImGuiCol_FrameBgHovered] = element_hover;
     colors[ImGuiCol_FrameBgActive] = element_active;
 
