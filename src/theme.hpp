@@ -76,7 +76,7 @@ void apply_theme_styling(Theme& theme) {
 
     auto element_hover = c.get_hover_color(c.element.value());
     auto element_active = c.get_active_color(c.element.value());
-    auto accent_active = c.get_active_color(c.element.value());
+    auto accent_active = c.get_active_color(c.accent.value());
 
     colors[ImGuiCol_WindowBg] = c.bg.value();
     colors[ImGuiCol_ChildBg] = c.panel1.value();
