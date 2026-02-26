@@ -27,19 +27,21 @@ bool Window::Start(const WindowConfig& config, std::function<void()> render_fram
         std::cerr << "vog::Window::Start: already running" << std::endl;
         return false;
     }
+    this->config_ = &config;
+
     should_stop_.store(false);
 
 #if defined(__APPLE__)
     // macOS requires the render loop on the main thread.
     // Start() blocks until the window closes or Stop() is called.
     running_.store(true);
-    RenderLoop(config, std::move(render_frame));
+    RenderLoop(std::move(render_frame));
     running_.store(false);
     return true;
 #else
     running_.store(true);
     try {
-        render_thread_ = std::thread(&Window::RenderLoop, this, config, std::move(render_frame));
+        render_thread_ = std::thread(&Window::RenderLoop, this, std::move(render_frame));
         return true;
     } catch (const std::exception& e) {
         std::cerr << "vog::Window::Start: " << e.what() << std::endl;
@@ -66,7 +68,7 @@ void Window::Wait() {
 
 // ---- Private implementation ----
 
-bool Window::InitializeGraphics(const WindowConfig& config) {
+bool Window::InitializeGraphics() {
     glfwSetErrorCallback(glfw_error_callback);
 
     if (!glfwInit()) {
@@ -88,7 +90,7 @@ bool Window::InitializeGraphics(const WindowConfig& config) {
 
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-    window_ = glfwCreateWindow(config.width, config.height, config.title, nullptr, nullptr);
+    window_ = glfwCreateWindow(config_->width, config_->height, config_->title, nullptr, nullptr);
     if (!window_) {
         std::cerr << "vog: failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -148,7 +150,22 @@ void Window::RenderFrameNow() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    active_render_frame_();
+    if (config_->createDefaultImGuiWindow) {
+        ImGuiIO& io = ImGui::GetIO();
+        ImGui::SetNextWindowPos({0, 0});
+        ImGui::SetNextWindowSize(io.DisplaySize);
+        ImGuiWindowFlags host_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+                                      ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus |
+                                      ImGuiWindowFlags_NoBringToFrontOnFocus;
+
+        ImGui::Begin("##host", nullptr, host_flags);
+    }
+
+    active_render_frame_();  // render the user's UI
+
+    if (config_->createDefaultImGuiWindow) {
+        ImGui::End();
+    }
 
     ImGui::Render();
 
@@ -160,8 +177,8 @@ void Window::RenderFrameNow() {
     glfwSwapBuffers(window_);
 }
 
-void Window::RenderLoop(const WindowConfig& config, std::function<void()> render_frame) {
-    if (!InitializeGraphics(config)) {
+void Window::RenderLoop(std::function<void()> render_frame) {
+    if (!InitializeGraphics()) {
         running_.store(false);
         return;
     }

@@ -88,9 +88,15 @@ void SetThemeColors(const ThemeColors& colors);
 // ---------------------------------------------------------------------------
 
 struct WindowConfig {
+    // Window title
     const char* title = "App";
+
+    // Initial window size
     int width = 1280;
     int height = 720;
+
+    // creates a default full-size ImGui window (with no decorations) to host the UI.
+    bool createDefaultImGuiWindow = true;
 };
 
 // Self-contained windowing + ImGui lifecycle.
@@ -129,11 +135,12 @@ class Window {
     void RenderFrameNow();
 
    private:
-    bool InitializeGraphics(const WindowConfig& config);
+    bool InitializeGraphics();
     void CleanupGraphics();
-    void RenderLoop(const WindowConfig& config, std::function<void()> render_frame);
+    void RenderLoop(std::function<void()> render_frame);
 
     GLFWwindow* window_ = nullptr;
+    const WindowConfig* config_ = nullptr;
     std::atomic<bool> running_{false};
     std::atomic<bool> should_stop_{false};
     std::thread render_thread_;

@@ -38,9 +38,7 @@ cfg.width  = 1280;
 cfg.height = 720;
 
 window.Start(cfg, []() {
-    ImGui::Begin("Hello");
-    ImGui::TextColored(vog::GetThemeColors().accent, "accent-colored text");
-    ImGui::End();
+    ImGui::TextColored(vog::GetThemeColors().accent, "Hello vog!");
 });
 
 // Block until the window is closed
