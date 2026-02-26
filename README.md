@@ -87,7 +87,7 @@ if (ImGui::Button(ICON_FA_COPY " Copy")) { ... }
 | `vog::widgets::ToggleButton(label, &value)` | iOS-style on/off toggle switch |
 | `vog::widgets::Combo(label, &index, items, count)` | `ImGui::Combo` with better popup padding |
 | `vog::widgets::ShowItemTooltip(text)` | Tooltip anchored below the previous item |
-| `vog::widgets::Button(text, bgColor)` | Button with optional background color and automatic text color for good contrast |
+| `vog::widgets::Button(text, textColor, bgColor)` | Button with optional text color and background color |
 
 ## Building the example
 

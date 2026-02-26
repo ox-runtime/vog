@@ -58,8 +58,8 @@ static vog::ThemeColors make_custom_theme() {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-static void ColorSwatch(const char* label, ImVec4 col) {
-    ImGui::ColorButton(label, col, ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_NoBorder, ImVec2(22, 22));
+static void ColorSwatch(const char* label, ImVec4& col) {
+    ImGui::ColorEdit4(label, (float*)&col, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
     ImGui::SameLine();
     ImGui::TextUnformatted(label);
 }
@@ -118,11 +118,11 @@ static void RenderFrame(DemoState& s) {
             if (vog::widgets::Button("Normal")) {
             }
             ImGui::SameLine();
-            if (vog::widgets::Button("Accent", tc.accent)) {
+            if (vog::widgets::Button("Accent", ImVec4(0.95f, 0.95f, 1.f, 1.f), tc.accent)) {
             }
 
             ImGui::SameLine();
-            if (vog::widgets::Button("Danger", tc.danger)) {
+            if (vog::widgets::Button("Danger", ImVec4(1.f, 0.95f, 0.95f, 1.f), tc.danger)) {
             }
 
             ImGui::EndTabItem();
@@ -210,32 +210,29 @@ static void RenderFrame(DemoState& s) {
 
             ImGui::Spacing();
             ImGui::SeparatorText("Current palette");
+            ImGui::TextUnformatted("Click a color to edit it.");
+            ImGui::Spacing();
 
-            struct {
-                const char* n;
-                ImVec4 v;
-            } swatches[] = {
-                {"bg", tc.bg},
-                {"surface", tc.surface},
-                {"titlebar", tc.titlebar},
-                {"element", tc.element},
-                {"border", tc.border},
-                {"text", tc.text},
-                {"text_muted", tc.text_muted},
-                {"accent", tc.accent},
-                {"selection", tc.selection},
-                {"positive", tc.positive},
-                {"warning", tc.warning},
-                {"danger", tc.danger},
+            vog::ThemeColors editable_theme = vog::GetThemeColors();
+            ImVec4* color_ptrs[] = {
+                &editable_theme.bg,         &editable_theme.surface, &editable_theme.titlebar,
+                &editable_theme.element,    &editable_theme.border,  &editable_theme.text,
+                &editable_theme.text_muted, &editable_theme.accent,  &editable_theme.selection,
+                &editable_theme.positive,   &editable_theme.warning, &editable_theme.danger,
             };
 
+            const char* names[] = {"bg",         "surface", "titlebar",  "element",  "border",  "text",
+                                   "text_muted", "accent",  "selection", "positive", "warning", "danger"};
+
             int col = 0;
-            for (auto& sw : swatches) {
+            for (int i = 0; i < 12; ++i) {
                 if (col > 0 && col % 2 == 0) ImGui::NewLine();
                 if (col % 2 == 1) ImGui::SameLine(220);
-                ColorSwatch(sw.n, sw.v);
+                ColorSwatch(names[i], *color_ptrs[i]);
                 ++col;
             }
+
+            vog::SetThemeColors(editable_theme);
 
             ImGui::EndTabItem();
         }

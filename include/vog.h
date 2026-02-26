@@ -228,24 +228,12 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     return changed;
 }
 
-// Function to calculate tinted text color based on background color
-inline ImVec4 CalculateTintedTextColor(const ImVec4& bg, const float textTintStrength = 0.15f) {
-    // Base text color: white for dark backgrounds, black for light backgrounds
-    bool isDark = ThemeColors::is_dark_color(bg);
-    ImVec4 baseColor = isDark ? ImVec4(1.0f, 1.0f, 1.0f, 1.0f) : ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-    // Add a slight tint based on the background color
-    float t = textTintStrength * (isDark ? 0.5f : 1.0f);
-    float t_inv = 1.0f - t;
-    return ImVec4(baseColor.x * t_inv + bg.x * t, baseColor.y * t_inv + bg.y * t, baseColor.z * t_inv + bg.z * t, 1.0f);
-}
-
 // Widget for a button with dynamic text coloring based on background color
-inline bool Button(const char* label, const ImVec4& bgColor) {
+inline bool Button(const char* label, const ImVec4& textColor, const ImVec4& bgColor) {
     // Calculate hover and active colors by modifying the background color
     ImVec4 hoverColor = ThemeColors::get_hover_color(bgColor, bgColor);
     ImVec4 activeColor = ThemeColors::get_active_color(bgColor, bgColor);
 
-    ImVec4 textColor = CalculateTintedTextColor(bgColor);
     ImGui::PushStyleColor(ImGuiCol_Text, textColor);
     ImGui::PushStyleColor(ImGuiCol_Button, bgColor);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, hoverColor);
@@ -255,10 +243,14 @@ inline bool Button(const char* label, const ImVec4& bgColor) {
     return clicked;
 }
 
-inline bool Button(const char* label) {
-    // use default element colors from the theme
+inline bool Button(const char* label, const ImVec4& textColor) {
     const ThemeColors& tc = GetThemeColors();
-    return Button(label, tc.element);
+    return Button(label, textColor, tc.element);
+}
+
+inline bool Button(const char* label) {
+    const ThemeColors& tc = GetThemeColors();
+    return Button(label, tc.text, tc.element);
 }
 
 }  // namespace widgets
