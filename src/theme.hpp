@@ -22,7 +22,7 @@ static void fill_dark_palette(ThemeColors& c) {
     c.text = ImVec4(0.86f, 0.86f, 0.86f, 1.0f);        // #DBDBDB
     c.text_muted = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);  // #8C8C8C
 
-    c.accent = ImVec4(0.26f, 0.62f, 0.95f, 1.0f);      // #429DF2
+    c.accent = ImVec4(0.1f, 0.51f, 0.90f, 1.0f);       // #1A84E6
     c.selection = ImVec4(0.26f, 0.62f, 0.95f, 0.30f);  // #429DF24D
 
     c.positive = ImVec4(0.40f, 0.74f, 0.40f, 1.0f);  // #66BD66
@@ -47,7 +47,7 @@ static void fill_light_palette(ThemeColors& c) {
     c.text = ImVec4(0.15f, 0.15f, 0.18f, 1.0f);        // #26262E
     c.text_muted = ImVec4(0.45f, 0.45f, 0.48f, 1.0f);  // #73737A
 
-    c.accent = ImVec4(0.28f, 0.58f, 0.92f, 1.0f);      // #4994EB
+    c.accent = ImVec4(0.03f, 0.50f, 0.94f, 1.0f);      // #0882F2
     c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);  // #3380E059
 
     c.positive = ImVec4(0.28f, 0.68f, 0.35f, 1.0f);  // #47AD59
