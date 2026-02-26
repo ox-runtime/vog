@@ -29,7 +29,7 @@ bool Window::Start(const WindowConfig& config, std::function<void()> render_fram
         std::cerr << "vog::Window::Start: already running" << std::endl;
         return false;
     }
-    this->config_ = &config;
+    config_ = config;
 
     should_stop_.store(false);
 
@@ -92,7 +92,7 @@ bool Window::InitializeGraphics() {
 
     glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
 
-    window_ = glfwCreateWindow(config_->width, config_->height, config_->title, nullptr, nullptr);
+    window_ = glfwCreateWindow(config_.width, config_.height, config_.title.c_str(), nullptr, nullptr);
     if (!window_) {
         std::cerr << "vog: failed to create GLFW window" << std::endl;
         glfwTerminate();
@@ -111,7 +111,7 @@ bool Window::InitializeGraphics() {
 
     // SetTheme resolves any nullopt fields from system defaults, so passing
     // an empty Theme (or a partially-filled user Theme) always works correctly.
-    SetTheme(config_->theme.value_or(Theme{}));
+    SetTheme(config_.theme.value_or(Theme{}));
 
     ImGui_ImplGlfw_InitForOpenGL(window_, true);
     if (!ImGui_ImplOpenGL3_Init(glsl_version)) {
@@ -155,7 +155,7 @@ void Window::RenderFrameNow() {
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    if (config_->createDefaultImGuiWindow) {
+    if (config_.createDefaultImGuiWindow) {
         ImGuiIO& io = ImGui::GetIO();
         ImGui::SetNextWindowPos({0, 0});
         ImGui::SetNextWindowSize(io.DisplaySize);
@@ -170,7 +170,7 @@ void Window::RenderFrameNow() {
 
     active_render_frame_();  // render the user's UI
 
-    if (config_->createDefaultImGuiWindow) {
+    if (config_.createDefaultImGuiWindow) {
         ImGui::End();
     }
 

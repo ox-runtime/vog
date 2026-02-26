@@ -8,6 +8,7 @@
 #include <atomic>
 #include <functional>
 #include <optional>
+#include <string>
 #include <thread>
 
 #include "IconsFontAwesome6.h"
@@ -99,7 +100,7 @@ struct Theme {
 
 struct WindowConfig {
     // Window title
-    const char* title = "App";
+    std::string title = "App";
 
     // Initial window size
     int width = 1280;
@@ -158,7 +159,7 @@ class Window {
     void RenderFrameNow();
 
     GLFWwindow* window_ = nullptr;
-    const WindowConfig* config_ = nullptr;
+    WindowConfig config_;
     std::atomic<bool> running_{false};
     std::atomic<bool> should_stop_{false};
     std::thread render_thread_;
