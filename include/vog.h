@@ -13,6 +13,8 @@
 #include "IconsFontAwesome6.h"
 #include "imgui.h"
 
+#define NOMINMAX
+
 struct GLFWwindow;
 
 // ---------------------------------------------------------------------------
