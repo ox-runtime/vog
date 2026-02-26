@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(vog VERSION 1.0.1 LANGUAGES CXX)
+project(vog VERSION 1.0.2 LANGUAGES CXX)
 
 option(VOG_BUILD_EXAMPLES "Build vog example applications" OFF)
 
