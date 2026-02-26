@@ -33,33 +33,35 @@ struct DemoState {
 static const char* COMBO_ITEMS[] = {"Option A", "Option B", "Option C", "Option D"};
 static constexpr int COMBO_COUNT = 4;
 
-// A bright custom theme to demonstrate SetThemeColors().
-static vog::ThemeColors make_custom_theme() {
-    vog::ThemeColors c{};
-    c.bg = ImVec4(0.06f, 0.07f, 0.14f, 1.0f);
-    c.surface = ImVec4(0.10f, 0.11f, 0.20f, 1.0f);
-    c.titlebar = ImVec4(0.08f, 0.09f, 0.17f, 1.0f);
-    c.element = ImVec4(0.18f, 0.20f, 0.35f, 1.0f);
-    c.border = ImVec4(0.28f, 0.31f, 0.52f, 1.0f);
-    c.border_subtle = ImVec4(0.14f, 0.15f, 0.27f, 1.0f);
-    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
-    c.text = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
-    c.text_muted = ImVec4(0.55f, 0.58f, 0.80f, 1.0f);
-    c.accent = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
-    c.selection = ImVec4(0.56f, 0.40f, 0.96f, 0.35f);
-    c.positive = ImVec4(0.35f, 0.85f, 0.60f, 1.0f);
-    c.warning = ImVec4(0.98f, 0.76f, 0.26f, 1.0f);
-    c.danger = ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
-    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.45f);
-    c.nav_dim = ImVec4(0.5f, 0.5f, 0.8f, 0.15f);
-    return c;
+// A bright custom theme to demonstrate SetTheme().
+static vog::Theme make_custom_theme() {
+    vog::Theme t;
+
+    t.colors.bg = ImVec4(0.06f, 0.07f, 0.14f, 1.0f);
+    t.colors.surface = ImVec4(0.10f, 0.11f, 0.20f, 1.0f);
+    t.colors.titlebar = ImVec4(0.08f, 0.09f, 0.17f, 1.0f);
+    t.colors.element = ImVec4(0.18f, 0.20f, 0.35f, 1.0f);
+    t.colors.border = ImVec4(0.28f, 0.31f, 0.52f, 1.0f);
+    t.colors.border_subtle = ImVec4(0.14f, 0.15f, 0.27f, 1.0f);
+    t.colors.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
+    t.colors.text = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
+    t.colors.text_muted = ImVec4(0.55f, 0.58f, 0.80f, 1.0f);
+    t.colors.accent = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
+    t.colors.selection = ImVec4(0.56f, 0.40f, 0.96f, 0.35f);
+    t.colors.positive = ImVec4(0.35f, 0.85f, 0.60f, 1.0f);
+    t.colors.warning = ImVec4(0.98f, 0.76f, 0.26f, 1.0f);
+    t.colors.danger = ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
+    t.colors.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.45f);
+    t.colors.nav_dim = ImVec4(0.5f, 0.5f, 0.8f, 0.15f);
+
+    return t;
 }
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-static void ColorSwatch(const char* label, ImVec4& col) {
-    ImGui::ColorEdit4(label, (float*)&col, ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+static void ColorSwatch(const char* label, std::optional<ImVec4>& col) {
+    ImGui::ColorEdit4(label, (float*)&col.value(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
     ImGui::SameLine();
     ImGui::TextUnformatted(label);
 }
@@ -70,7 +72,7 @@ static void ColorSwatch(const char* label, ImVec4& col) {
 static void RenderFrame(DemoState& s) {
     s.sim_time += ImGui::GetIO().DeltaTime;
 
-    const vog::ThemeColors& tc = vog::GetThemeColors();
+    const vog::ThemeColors& tc = vog::Window::GetTheme().colors;
 
     // ---- Tab bar ----
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12, 10));
@@ -108,11 +110,11 @@ static void RenderFrame(DemoState& s) {
             if (vog::widgets::Button("Normal")) {
             }
             ImGui::SameLine();
-            if (vog::widgets::Button("Accent", ImVec4(0.95f, 0.95f, 1.f, 1.f), tc.accent)) {
+            if (vog::widgets::Button("Accent", ImVec4(0.95f, 0.95f, 1.f, 1.f), tc.accent.value())) {
             }
 
             ImGui::SameLine();
-            if (vog::widgets::Button("Danger", ImVec4(1.f, 0.95f, 0.95f, 1.f), tc.danger)) {
+            if (vog::widgets::Button("Danger", ImVec4(1.f, 0.95f, 0.95f, 1.f), tc.danger.value())) {
             }
 
             ImGui::EndTabItem();
@@ -126,13 +128,13 @@ static void RenderFrame(DemoState& s) {
 
             // Status badges
             ImGui::SeparatorText("Status indicators");
-            ImGui::PushStyleColor(ImGuiCol_Text, tc.positive);
+            ImGui::PushStyleColor(ImGuiCol_Text, tc.positive.value());
             ImGui::BulletText("All systems operational");
             ImGui::PopStyleColor();
-            ImGui::PushStyleColor(ImGuiCol_Text, tc.warning);
+            ImGui::PushStyleColor(ImGuiCol_Text, tc.warning.value());
             ImGui::BulletText("Latency elevated (32 ms)");
             ImGui::PopStyleColor();
-            ImGui::PushStyleColor(ImGuiCol_Text, tc.danger);
+            ImGui::PushStyleColor(ImGuiCol_Text, tc.danger.value());
             ImGui::BulletText("Service B unreachable");
             ImGui::PopStyleColor();
 
@@ -165,7 +167,7 @@ static void RenderFrame(DemoState& s) {
                     {"GPU temp", "74 C", "Warn"},
                     {"Disk I/O", "N/A", "Error"},
                 };
-                const ImVec4 row_colors[] = {tc.text, tc.text, tc.warning, tc.danger};
+                const ImVec4 row_colors[] = {tc.text.value(), tc.text.value(), tc.warning.value(), tc.danger.value()};
 
                 for (int r = 0; r < 4; ++r) {
                     ImGui::TableNextRow();
@@ -190,10 +192,10 @@ static void RenderFrame(DemoState& s) {
 
             if (ImGui::Button("Use custom \"space\" theme")) {
                 s.use_custom_theme = true;
-                vog::SetThemeColors(make_custom_theme());
+                vog::Window::SetTheme(make_custom_theme());
             }
             if (s.use_custom_theme) {
-                ImGui::PushStyleColor(ImGuiCol_Text, tc.text_muted);
+                ImGui::PushStyleColor(ImGuiCol_Text, tc.text_muted.value());
                 ImGui::TextUnformatted("  Custom 'space' theme active. Restart demo to reset.");
                 ImGui::PopStyleColor();
             }
@@ -203,12 +205,12 @@ static void RenderFrame(DemoState& s) {
             ImGui::TextUnformatted("Click a color to edit it.");
             ImGui::Spacing();
 
-            vog::ThemeColors editable_theme = vog::GetThemeColors();
-            ImVec4* color_ptrs[] = {
-                &editable_theme.bg,         &editable_theme.surface, &editable_theme.titlebar,
-                &editable_theme.element,    &editable_theme.border,  &editable_theme.text,
-                &editable_theme.text_muted, &editable_theme.accent,  &editable_theme.selection,
-                &editable_theme.positive,   &editable_theme.warning, &editable_theme.danger,
+            vog::ThemeColors editable_colors = vog::Window::GetTheme().colors;
+            std::optional<ImVec4>* color_ptrs[] = {
+                &editable_colors.bg,         &editable_colors.surface, &editable_colors.titlebar,
+                &editable_colors.element,    &editable_colors.border,  &editable_colors.text,
+                &editable_colors.text_muted, &editable_colors.accent,  &editable_colors.selection,
+                &editable_colors.positive,   &editable_colors.warning, &editable_colors.danger,
             };
 
             const char* names[] = {"bg",         "surface", "titlebar",  "element",  "border",  "text",
@@ -222,7 +224,7 @@ static void RenderFrame(DemoState& s) {
                 ++col;
             }
 
-            vog::SetThemeColors(editable_theme);
+            vog::Window::GetTheme().colors = editable_colors;
 
             ImGui::EndTabItem();
         }

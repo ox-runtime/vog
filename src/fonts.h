@@ -10,10 +10,9 @@
 #include "IconsFontAwesome6.h"
 #include "fa_solid_900.h"
 #include "imgui.h"
+#include "vog.h"
 
 namespace vog {
-
-const float GLOBAL_FONT_SIZE = 14.0f;
 
 // Returns a platform-appropriate Arial-like font path.
 inline std::string GetFontPath() {
@@ -39,15 +38,14 @@ inline std::string GetFontPath() {
 
 // Load the platform font and Font Awesome icons into io.Fonts.
 // Must be called after ImGui::CreateContext() and before the first frame.
-inline void setup_fonts(ImGuiIO& io, GLFWwindow* window) {
+void Window::setup_fonts() {
+    ImGuiIO& io = ImGui::GetIO();
     std::string font_path = GetFontPath();
 
-    float xscale, yscale;
-    glfwGetWindowContentScale(window, &xscale, &yscale);
-    float fontScale = (xscale + yscale) * 0.5f;
-    float fontSize = GLOBAL_FONT_SIZE * fontScale;
+    float globalFontSize = GetTheme().vars.font_size.value();
+    float fontSize = globalFontSize * last_content_scale_;
 #ifdef __APPLE__
-    fontSize *= (72.0f / 96.0f);
+    fontSize *= (72.0f / 96.0f);  // macOS uses 72 DPI as the default, while Windows and Linux typically use 96 DPI
 #endif
 
     ImFont* default_font = nullptr;
@@ -55,8 +53,8 @@ inline void setup_fonts(ImGuiIO& io, GLFWwindow* window) {
         default_font = io.Fonts->AddFontFromFileTTF(font_path.c_str(), fontSize);
     }
 
-    if (fontScale > 1.001f) {
-        std::cout << "vog: high DPI display detected (scale: " << fontScale << "x)" << std::endl;
+    if (last_content_scale_ > 1.001f) {
+        std::cout << "vog: high DPI display detected (scale: " << last_content_scale_ << "x)" << std::endl;
     }
 
     if (default_font) {
@@ -69,10 +67,10 @@ inline void setup_fonts(ImGuiIO& io, GLFWwindow* window) {
     ImFontConfig config;
     config.MergeMode = true;
     config.FontDataOwnedByAtlas = false;
-    config.GlyphMinAdvanceX = 13.0f;
+    config.GlyphMinAdvanceX = globalFontSize;
     static const ImWchar icon_ranges[] = {ICON_MIN_FA, ICON_MAX_FA, 0};
-    io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, 13.0f, &config,
-                                             icon_ranges);
+    io.Fonts->AddFontFromMemoryCompressedTTF(fa_solid_900_compressed_data, fa_solid_900_compressed_size, globalFontSize,
+                                             &config, icon_ranges);
 }
 
 }  // namespace vog

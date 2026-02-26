@@ -38,35 +38,63 @@ cfg.width  = 1280;
 cfg.height = 720;
 
 window.Start(cfg, []() {
-    ImGui::TextColored(vog::GetThemeColors().accent, "Hello vog!");
+    const vog::ThemeColors& tc = vog::Window::GetTheme().colors;
+    ImGui::TextColored(tc.accent.value(), "Hello vog!");
 });
 
 // Block until the window is closed
 window.Wait();
 ```
 
-## Theme colors
+## Theme
 
-`GetThemeColors()` returns a reference to the active [ThemeColors](include/vog.h) instance. A dark/light theme is chosen automatically based on the OS dark/light mode setting when the window opens, but you can set a custom theme as well (see below).
+`Window::GetTheme()` returns a reference to the active `Theme`, which has two parts:
+
+- **`colors`** — a `ThemeColors` with semantic color tokens (`bg`, `surface`, `accent`, `text`, etc.)
+- **`vars`** — a `ThemeVars` with layout variables (`window_padding`, `font_size`)
+
+A dark or light palette is chosen automatically from the OS setting when the window opens. You can override any subset of fields via `WindowConfig::theme` at startup, or by calling `Window::SetTheme()` at any time after `Start()`.
 
 **Note:** Dark mode detection on Linux needs more work. Please feel free to [contribute](src/platform_linux.cpp)!
 
-### Custom theme colors
+### Accessing theme values
 
-Supply a fully populated `ThemeColors` to `SetThemeColors()` at any point after `Window::Start()` has been called:
+All `ThemeColors` and `ThemeVars` fields are `std::optional`. After the window is open they are always populated, so `.value()` is safe:
 
 ```cpp
-vog::ThemeColors my_theme;
-my_theme.bg             = ImVec4(0.05f, 0.05f, 0.10f, 1.0f);  // RGBA
-my_theme.surface        = ImVec4(0.09f, 0.09f, 0.16f, 1.0f);
-my_theme.text           = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
-my_theme.accent         = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
-// ... fill the remaining fields ...
-
-vog::SetThemeColors(my_theme);
+const vog::ThemeColors& tc = vog::Window::GetTheme().colors;
+ImGui::TextColored(tc.accent.value(), "Hello!");
 ```
 
-`SetThemeColors()` overwrites the color table and immediately re-applies all ImGui style settings, so the change takes effect on the very next frame.
+### Overriding the theme at startup
+
+Set `WindowConfig::theme` to a partially or fully populated `Theme`. Any field left unset falls back to the default system palette — you only need to specify what you want to change:
+
+```cpp
+vog::Theme my_theme;
+my_theme.colors.accent   = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);  // custom accent
+my_theme.vars.font_size  = 16.0f;                               // larger font
+// everything else inherits from the dark/light system defaults
+
+vog::WindowConfig cfg;
+cfg.theme = my_theme;
+```
+
+### Changing the theme at runtime
+
+Call `Window::SetTheme()` at any point after `Start()` has been called. Unset fields again fall back to the system defaults, and the change takes effect on the very next frame:
+
+```cpp
+vog::Theme space_theme;
+space_theme.colors.bg      = ImVec4(0.06f, 0.07f, 0.14f, 1.0f);
+space_theme.colors.accent  = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
+space_theme.colors.text    = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
+// ... set as many or as few fields as needed ...
+
+vog::Window::SetTheme(space_theme);
+```
+
+**Note:** `Start()` will block on Mac, since it runs on the main thread. You can call `SetTheme()` from inside the Render callback.
 
 ## Font Awesome icons
 

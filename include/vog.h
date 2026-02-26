@@ -7,6 +7,7 @@
 
 #include <atomic>
 #include <functional>
+#include <optional>
 #include <thread>
 
 #include "IconsFontAwesome6.h"
@@ -19,40 +20,56 @@ struct GLFWwindow;
 // ---------------------------------------------------------------------------
 namespace vog {
 
+struct ThemeVars {
+    // Window padding
+    std::optional<ImVec2> window_padding;
+
+    // Main application font size in pixels
+    std::optional<float> font_size;
+};
+
 // Semantic color tokens for the UI theme.
-// Fill a ThemeColors and pass it to SetThemeColors() to apply a custom palette.
+// All fields are optional: set only the ones you want to customize.
+// Unset fields fall back to the default system theme (dark or light) when
+// passed to WindowConfig::theme or SetTheme().
 struct ThemeColors {
     // Backgrounds
-    ImVec4 bg;        // app / window background
-    ImVec4 surface;   // elevated surface: panels, popups, child windows
-    ImVec4 titlebar;  // titlebar and menubar background
+    std::optional<ImVec4> bg;        // app / window background
+    std::optional<ImVec4> surface;   // elevated surface: panels, popups, child windows
+    std::optional<ImVec4> titlebar;  // titlebar and menubar background
 
     // Interactive element states
-    ImVec4 element;  // default state of input elements
+    std::optional<ImVec4> element;  // default state of input elements
 
     // Borders
-    ImVec4 border;         // primary borders and dividers
-    ImVec4 border_subtle;  // inner / light borders (table cell lines, etc.)
-    ImVec4 border_shadow;  // drop-shadow tint (transparent in most themes)
+    std::optional<ImVec4> border;         // primary borders and dividers
+    std::optional<ImVec4> border_subtle;  // inner / light borders (table cell lines, etc.)
+    std::optional<ImVec4> border_shadow;  // drop-shadow tint (transparent in most themes)
 
     // Text
-    ImVec4 text;        // primary readable text
-    ImVec4 text_muted;  // secondary, disabled, or hint text
+    std::optional<ImVec4> text;        // primary readable text
+    std::optional<ImVec4> text_muted;  // secondary, disabled, or hint text
 
     // Accent (brand / interactive color)
-    ImVec4 accent;     // focus rings, nav highlight, slider grab
-    ImVec4 selection;  // text-selection highlight (translucent accent)
+    std::optional<ImVec4> accent;     // focus rings, nav highlight, slider grab
+    std::optional<ImVec4> selection;  // text-selection highlight (translucent accent)
 
     // Status
-    ImVec4 positive;  // success, ok, checkmarks
-    ImVec4 warning;   // caution, drag-drop target
-    ImVec4 danger;    // errors, critical status, delete actions
+    std::optional<ImVec4> positive;  // success, ok, checkmarks
+    std::optional<ImVec4> warning;   // caution, drag-drop target
+    std::optional<ImVec4> danger;    // errors, critical status, delete actions
 
     // Overlays
-    ImVec4 dim;      // modal / full-screen dim scrim
-    ImVec4 nav_dim;  // Ctrl+Tab nav-windowing background dim
+    std::optional<ImVec4> dim;      // modal / full-screen dim scrim
+    std::optional<ImVec4> nav_dim;  // Ctrl+Tab nav-windowing background dim
 
    private:
+    static bool is_dark_color(const ImVec4& color) {
+        float luminance = 0.2126f * color.x + 0.7152f * color.y + 0.0722f * color.z;
+        bool isDark = luminance < 0.5f;
+        return isDark;
+    }
+
     static ImVec4 adjust_brightness(const ImVec4& color, const ImVec4& bg, float amount) {
         amount *= is_dark_color(bg) ? -1 : 1;
         return ImVec4(std::min(color.x + amount, 1.0f), std::min(color.y + amount, 1.0f),
@@ -60,28 +77,19 @@ struct ThemeColors {
     }
 
    public:
-    static bool is_dark_color(const ImVec4& color) {
-        float luminance = 0.2126f * color.x + 0.7152f * color.y + 0.0722f * color.z;
-        bool isDark = luminance < 0.5f;
-        return isDark;
-    }
-
     static ImVec4 get_hover_color(const ImVec4& color, const ImVec4& bg) { return adjust_brightness(color, bg, 0.05f); }
     static ImVec4 get_active_color(const ImVec4& color, const ImVec4& bg) {
         return adjust_brightness(color, bg, -0.1f);
     }
 
-    ImVec4 get_hover_color(const ImVec4& color) { return ThemeColors::get_hover_color(color, bg); }
-    ImVec4 get_active_color(const ImVec4& color) { return ThemeColors::get_active_color(color, bg); }
+    ImVec4 get_hover_color(const ImVec4& color) { return ThemeColors::get_hover_color(color, bg.value()); }
+    ImVec4 get_active_color(const ImVec4& color) { return ThemeColors::get_active_color(color, bg.value()); }
 };
 
-// Returns a reference to the active ThemeColors.
-// Valid after Window::Start() has been called.
-ThemeColors& GetThemeColors();
-
-// Override the active theme with a user-supplied palette and re-apply styling.
-// Must be called after Window::Start() has been called (ImGui context exists).
-void SetThemeColors(const ThemeColors& colors);
+struct Theme {
+    ThemeColors colors;
+    ThemeVars vars;
+};
 
 // ---------------------------------------------------------------------------
 // Window
@@ -94,6 +102,10 @@ struct WindowConfig {
     // Initial window size
     int width = 1280;
     int height = 720;
+
+    // Optional partial theme override. Set only the fields you want to
+    // customize; unset fields fall back to the default system theme.
+    std::optional<Theme> theme;
 
     // creates a default full-size ImGui window (with no decorations) to host the UI.
     bool createDefaultImGuiWindow = true;
@@ -132,12 +144,16 @@ class Window {
     // Escape hatch: the raw GLFW window pointer (nullptr if not running).
     GLFWwindow* GetNativeWindow() const { return window_; }
 
-    void RenderFrameNow();
+    static Theme& GetTheme() { return theme_; }
+    static void SetTheme(const Theme& theme);
 
    private:
     bool InitializeGraphics();
     void CleanupGraphics();
     void RenderLoop(std::function<void()> render_frame);
+    void setup_fonts();
+
+    void RenderFrameNow();
 
     GLFWwindow* window_ = nullptr;
     const WindowConfig* config_ = nullptr;
@@ -145,6 +161,9 @@ class Window {
     std::atomic<bool> should_stop_{false};
     std::thread render_thread_;
     std::function<void()> active_render_frame_;
+    float last_content_scale_ = 1.0f;
+    float last_global_font_size_ = -1.0f;
+    static Theme theme_;
 };
 
 // ---------------------------------------------------------------------------
@@ -206,14 +225,14 @@ inline bool ToggleButton(const char* label, bool* v, bool labelOnRight = true) {
     }
 
     const bool hovered = ImGui::IsItemHovered();
-    ThemeColors& tc = GetThemeColors();
+    ThemeColors& tc = Window::GetTheme().colors;
 
-    ImVec4 col_on = hovered ? tc.get_hover_color(tc.accent) : tc.accent;
-    ImVec4 col_off = hovered ? tc.element : tc.get_active_color(tc.element);
-    ImVec4 b = tc.border;
+    ImVec4 col_on = hovered ? tc.get_hover_color(tc.accent.value()) : tc.accent.value();
+    ImVec4 col_off = hovered ? tc.element.value() : tc.get_active_color(tc.element.value());
+    ImVec4 b = tc.border.value();
 
     ImU32 col_bg = ImGui::GetColorU32(*v ? col_on : col_off);
-    ImU32 col_border = ImGui::GetColorU32(*v ? ImVec4(0.0f, 0.0f, 0.0f, 0.0f) : tc.border);
+    ImU32 col_border = ImGui::GetColorU32(*v ? ImVec4(0.0f, 0.0f, 0.0f, 0.0f) : tc.border.value());
     ImU32 col_knob = ImGui::GetColorU32(ImVec4(1.f, 1.f, 1.f, 1.f));
     ImU32 col_knob_border = ImGui::GetColorU32(*v ? ImVec4(b.x, b.y, b.z, 0.55f) : ImVec4(b.x, b.y, b.z, 0.8f));
 
@@ -251,13 +270,13 @@ inline bool Button(const char* label, const ImVec4& textColor, const ImVec4& bgC
 }
 
 inline bool Button(const char* label, const ImVec4& textColor) {
-    const ThemeColors& tc = GetThemeColors();
-    return Button(label, textColor, tc.element);
+    const ThemeColors& tc = Window::GetTheme().colors;
+    return Button(label, textColor, tc.element.value());
 }
 
 inline bool Button(const char* label) {
-    const ThemeColors& tc = GetThemeColors();
-    return Button(label, tc.text, tc.element);
+    const ThemeColors& tc = Window::GetTheme().colors;
+    return Button(label, tc.text.value(), tc.element.value());
 }
 
 }  // namespace widgets

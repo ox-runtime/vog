@@ -4,11 +4,11 @@
 
 namespace vog {
 
-static ThemeColors g_theme_colors;
-
 // ---- Built-in palettes ----
 
-static void fill_dark_palette(ThemeColors& c) {
+static ThemeColors get_default_dark_palette() {
+    ThemeColors c;
+
     c.bg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);        // #141414
     c.surface = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);   // #0D0D0D
     c.titlebar = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);  // #262626
@@ -31,9 +31,13 @@ static void fill_dark_palette(ThemeColors& c) {
 
     c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
     c.nav_dim = ImVec4(0.8f, 0.8f, 0.8f, 0.20f);  // #CCCCCC33
+
+    return c;
 }
 
-static void fill_light_palette(ThemeColors& c) {
+static ThemeColors get_default_light_palette() {
+    ThemeColors c;
+
     c.bg = ImVec4(0.95f, 0.95f, 0.96f, 1.0f);        // #F2F2F5
     c.surface = ImVec4(0.98f, 0.98f, 0.99f, 1.0f);   // #FAFAFC
     c.titlebar = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);  // #EBEBF0
@@ -56,89 +60,95 @@ static void fill_light_palette(ThemeColors& c) {
 
     c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
     c.nav_dim = ImVec4(0.2f, 0.2f, 0.2f, 0.20f);  // #33333333
+
+    return c;
+}
+
+static ThemeColors get_default_theme_colors() {
+    return is_system_dark_mode() ? get_default_dark_palette() : get_default_light_palette();
 }
 
 // ---- Style application ----
 
-void apply_theme_styling() {
+void apply_theme_styling(Theme& theme) {
     ImGuiStyle& style = ImGui::GetStyle();
     ImVec4* colors = style.Colors;
-    ThemeColors& c = g_theme_colors;
+    ThemeColors& c = theme.colors;
 
-    const ImVec4 nav_highlight{c.text.x, c.text.y, c.text.z, 0.7f};
-    const ImVec4 row_bg_alt{c.text.x, c.text.y, c.text.z, 0.04f};
+    const ImVec4 nav_highlight{c.text.value().x, c.text.value().y, c.text.value().z, 0.7f};
+    const ImVec4 row_bg_alt{c.text.value().x, c.text.value().y, c.text.value().z, 0.04f};
 
-    auto element_hover = c.get_hover_color(c.element);
-    auto element_active = c.get_active_color(c.element);
-    auto accent_active = c.get_active_color(c.element);
+    auto element_hover = c.get_hover_color(c.element.value());
+    auto element_active = c.get_active_color(c.element.value());
+    auto accent_active = c.get_active_color(c.element.value());
 
-    colors[ImGuiCol_WindowBg] = c.bg;
-    colors[ImGuiCol_ChildBg] = c.surface;
-    colors[ImGuiCol_PopupBg] = c.surface;
-    colors[ImGuiCol_Border] = c.border;
-    colors[ImGuiCol_BorderShadow] = c.border_shadow;
+    colors[ImGuiCol_WindowBg] = c.bg.value();
+    colors[ImGuiCol_ChildBg] = c.surface.value();
+    colors[ImGuiCol_PopupBg] = c.surface.value();
+    colors[ImGuiCol_Border] = c.border.value();
+    colors[ImGuiCol_BorderShadow] = c.border_shadow.value();
 
-    colors[ImGuiCol_FrameBg] = c.element;
+    colors[ImGuiCol_FrameBg] = c.element.value();
     colors[ImGuiCol_FrameBgHovered] = element_hover;
     colors[ImGuiCol_FrameBgActive] = element_active;
 
-    colors[ImGuiCol_TitleBg] = c.titlebar;
-    colors[ImGuiCol_TitleBgActive] = c.surface;
-    colors[ImGuiCol_TitleBgCollapsed] = c.titlebar;
-    colors[ImGuiCol_MenuBarBg] = c.titlebar;
+    colors[ImGuiCol_TitleBg] = c.titlebar.value();
+    colors[ImGuiCol_TitleBgActive] = c.surface.value();
+    colors[ImGuiCol_TitleBgCollapsed] = c.titlebar.value();
+    colors[ImGuiCol_MenuBarBg] = c.titlebar.value();
 
-    colors[ImGuiCol_ScrollbarBg] = c.surface;
-    colors[ImGuiCol_ScrollbarGrab] = c.element;
+    colors[ImGuiCol_ScrollbarBg] = c.surface.value();
+    colors[ImGuiCol_ScrollbarGrab] = c.element.value();
     colors[ImGuiCol_ScrollbarGrabHovered] = element_hover;
     colors[ImGuiCol_ScrollbarGrabActive] = element_active;
 
-    colors[ImGuiCol_CheckMark] = c.positive;
-    colors[ImGuiCol_SliderGrab] = c.accent;
+    colors[ImGuiCol_CheckMark] = c.positive.value();
+    colors[ImGuiCol_SliderGrab] = c.accent.value();
     colors[ImGuiCol_SliderGrabActive] = accent_active;
 
-    colors[ImGuiCol_Button] = c.element;
+    colors[ImGuiCol_Button] = c.element.value();
     colors[ImGuiCol_ButtonHovered] = element_hover;
     colors[ImGuiCol_ButtonActive] = element_active;
 
-    colors[ImGuiCol_Header] = c.element;
+    colors[ImGuiCol_Header] = c.element.value();
     colors[ImGuiCol_HeaderHovered] = element_hover;
     colors[ImGuiCol_HeaderActive] = element_active;
 
-    colors[ImGuiCol_Separator] = c.border;
+    colors[ImGuiCol_Separator] = c.border.value();
     colors[ImGuiCol_SeparatorHovered] = element_active;
-    colors[ImGuiCol_SeparatorActive] = c.accent;
+    colors[ImGuiCol_SeparatorActive] = c.accent.value();
 
-    colors[ImGuiCol_ResizeGrip] = c.element;
+    colors[ImGuiCol_ResizeGrip] = c.element.value();
     colors[ImGuiCol_ResizeGripHovered] = element_hover;
     colors[ImGuiCol_ResizeGripActive] = element_active;
 
-    colors[ImGuiCol_Tab] = c.element;
+    colors[ImGuiCol_Tab] = c.element.value();
     colors[ImGuiCol_TabHovered] = element_hover;
     colors[ImGuiCol_TabActive] = element_active;
-    colors[ImGuiCol_TabUnfocused] = c.element;
+    colors[ImGuiCol_TabUnfocused] = c.element.value();
     colors[ImGuiCol_TabUnfocusedActive] = element_hover;
 
-    colors[ImGuiCol_PlotLines] = c.accent;
-    colors[ImGuiCol_PlotLinesHovered] = c.warning;
-    colors[ImGuiCol_PlotHistogram] = c.accent;
-    colors[ImGuiCol_PlotHistogramHovered] = c.positive;
+    colors[ImGuiCol_PlotLines] = c.accent.value();
+    colors[ImGuiCol_PlotLinesHovered] = c.warning.value();
+    colors[ImGuiCol_PlotHistogram] = c.accent.value();
+    colors[ImGuiCol_PlotHistogramHovered] = c.positive.value();
 
-    colors[ImGuiCol_TableHeaderBg] = c.element;
-    colors[ImGuiCol_TableBorderStrong] = c.border;
-    colors[ImGuiCol_TableBorderLight] = c.border_subtle;
+    colors[ImGuiCol_TableHeaderBg] = c.element.value();
+    colors[ImGuiCol_TableBorderStrong] = c.border.value();
+    colors[ImGuiCol_TableBorderLight] = c.border_subtle.value();
     colors[ImGuiCol_TableRowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     colors[ImGuiCol_TableRowBgAlt] = row_bg_alt;
 
-    colors[ImGuiCol_Text] = c.text;
-    colors[ImGuiCol_TextDisabled] = c.text_muted;
-    colors[ImGuiCol_TextSelectedBg] = c.selection;
+    colors[ImGuiCol_Text] = c.text.value();
+    colors[ImGuiCol_TextDisabled] = c.text_muted.value();
+    colors[ImGuiCol_TextSelectedBg] = c.selection.value();
 
-    colors[ImGuiCol_DragDropTarget] = c.warning;
+    colors[ImGuiCol_DragDropTarget] = c.warning.value();
 
-    colors[ImGuiCol_NavHighlight] = c.accent;
+    colors[ImGuiCol_NavHighlight] = c.accent.value();
     colors[ImGuiCol_NavWindowingHighlight] = nav_highlight;
-    colors[ImGuiCol_NavWindowingDimBg] = c.nav_dim;
-    colors[ImGuiCol_ModalWindowDimBg] = c.dim;
+    colors[ImGuiCol_NavWindowingDimBg] = c.nav_dim.value();
+    colors[ImGuiCol_ModalWindowDimBg] = c.dim.value();
 
     // Rounding
     style.WindowRounding = 4.0f;
@@ -170,20 +180,37 @@ void apply_theme_styling() {
     style.AntiAliasedFill = true;
 }
 
-void setup_theme() {
-    if (is_system_dark_mode()) {
-        fill_dark_palette(g_theme_colors);
-    } else {
-        fill_light_palette(g_theme_colors);
-    }
-    apply_theme_styling();
-}
+void Window::SetTheme(const Theme& theme) {
+    // Resolve: fill any nullopt fields from system defaults so theme_ is always
+    // fully populated and safe to dereference in rendering / widget code.
+    ThemeColors defaults = get_default_theme_colors();
+    Theme resolved;
+    auto& rc = resolved.colors;
+    const auto& uc = theme.colors;
+    rc.bg = uc.bg.has_value() ? uc.bg : defaults.bg;
+    rc.surface = uc.surface.has_value() ? uc.surface : defaults.surface;
+    rc.titlebar = uc.titlebar.has_value() ? uc.titlebar : defaults.titlebar;
+    rc.element = uc.element.has_value() ? uc.element : defaults.element;
+    rc.border = uc.border.has_value() ? uc.border : defaults.border;
+    rc.border_subtle = uc.border_subtle.has_value() ? uc.border_subtle : defaults.border_subtle;
+    rc.border_shadow = uc.border_shadow.has_value() ? uc.border_shadow : defaults.border_shadow;
+    rc.text = uc.text.has_value() ? uc.text : defaults.text;
+    rc.text_muted = uc.text_muted.has_value() ? uc.text_muted : defaults.text_muted;
+    rc.accent = uc.accent.has_value() ? uc.accent : defaults.accent;
+    rc.selection = uc.selection.has_value() ? uc.selection : defaults.selection;
+    rc.positive = uc.positive.has_value() ? uc.positive : defaults.positive;
+    rc.warning = uc.warning.has_value() ? uc.warning : defaults.warning;
+    rc.danger = uc.danger.has_value() ? uc.danger : defaults.danger;
+    rc.dim = uc.dim.has_value() ? uc.dim : defaults.dim;
+    rc.nav_dim = uc.nav_dim.has_value() ? uc.nav_dim : defaults.nav_dim;
 
-ThemeColors& GetThemeColors() { return g_theme_colors; }
+    auto& rv = resolved.vars;
+    const auto& uv = theme.vars;
+    rv.window_padding = uv.window_padding.has_value() ? uv.window_padding : ImVec2(10.0f, 10.0f);
+    rv.font_size = uv.font_size.has_value() ? uv.font_size : 14.0f;
 
-void SetThemeColors(const ThemeColors& colors) {
-    g_theme_colors = colors;
-    apply_theme_styling();
+    theme_ = resolved;
+    apply_theme_styling(theme_);
 }
 
 }  // namespace vog

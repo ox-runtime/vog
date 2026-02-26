@@ -14,6 +14,8 @@
 
 namespace vog {
 
+Theme Window::theme_;
+
 static void glfw_error_callback(int error, const char* description) {
     std::cerr << "vog: GLFW error " << error << ": " << description << std::endl;
 }
@@ -107,8 +109,9 @@ bool Window::InitializeGraphics() {
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
-    setup_fonts(io, window_);
-    setup_theme();
+    // SetTheme resolves any nullopt fields from system defaults, so passing
+    // an empty Theme (or a partially-filled user Theme) always works correctly.
+    SetTheme(config_->theme.value_or(Theme{}));
 
     ImGui_ImplGlfw_InitForOpenGL(window_, true);
     if (!ImGui_ImplOpenGL3_Init(glsl_version)) {
@@ -146,6 +149,8 @@ void Window::RenderFrameNow() {
     glfwGetFramebufferSize(window_, &display_w, &display_h);
     if (display_w == 0 || display_h == 0) return;
 
+    ThemeVars theme_vars = GetTheme().vars;
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
@@ -158,7 +163,7 @@ void Window::RenderFrameNow() {
                                       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus |
                                       ImGuiWindowFlags_NoBringToFrontOnFocus;
 
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 10));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, theme_vars.window_padding.value());
         ImGui::Begin("##host", nullptr, host_flags);
         ImGui::PopStyleVar();
     }
@@ -171,12 +176,18 @@ void Window::RenderFrameNow() {
 
     ImGui::Render();
 
-    const ThemeColors& tc = GetThemeColors();
+    const ThemeColors& tc = GetTheme().colors;
     glViewport(0, 0, display_w, display_h);
-    glClearColor(tc.bg.x, tc.bg.y, tc.bg.z, tc.bg.w);
+    glClearColor(tc.bg.value().x, tc.bg.value().y, tc.bg.value().z, tc.bg.value().w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     glfwSwapBuffers(window_);
+}
+
+inline float getContentScale(GLFWwindow* window) {
+    float xs, ys;
+    glfwGetWindowContentScale(window, &xs, &ys);
+    return (xs + ys) * 0.5f;
 }
 
 void Window::RenderLoop(std::function<void()> render_frame) {
@@ -199,26 +210,27 @@ void Window::RenderLoop(std::function<void()> render_frame) {
 
     ImGuiIO& io = ImGui::GetIO();
 
-    float last_content_scale = 0.0f;
-    {
-        float xs, ys;
-        glfwGetWindowContentScale(window_, &xs, &ys);
-        last_content_scale = (xs + ys) * 0.5f;
-    }
+    last_content_scale_ = getContentScale(window_);
+    last_global_font_size_ = -1.0f;  // force font atlas build on first loop iteration
 
     while (!should_stop_.load() && !glfwWindowShouldClose(window_)) {
         glfwPollEvents();
         std::this_thread::sleep_for(std::chrono::milliseconds(16));
 
         // Rebuild the font atlas if the content scale changed (window moved
-        // to a display with a different DPI).
-        float xs, ys;
-        glfwGetWindowContentScale(window_, &xs, &ys);
-        float current_content_scale = (xs + ys) * 0.5f;
-        if (std::abs(current_content_scale - last_content_scale) > 0.01f) {
-            last_content_scale = current_content_scale;
+        // to a display with a different DPI), or theme vars changed the font size
+        float current_content_scale = getContentScale(window_);
+        bool content_scale_changed = std::abs(current_content_scale - last_content_scale_) > 0.01f;
+
+        float current_global_font_size = GetTheme().vars.font_size.value();
+        bool theme_font_size_changed = std::abs(current_global_font_size - last_global_font_size_) > 0.01f;
+
+        if (content_scale_changed || theme_font_size_changed) {
+            last_content_scale_ = current_content_scale;
+            last_global_font_size_ = current_global_font_size;
             io.Fonts->Clear();
-            setup_fonts(io, window_);
+
+            setup_fonts();
             ImGui_ImplOpenGL3_CreateFontsTexture();
         }
 
