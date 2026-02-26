@@ -9,15 +9,14 @@ namespace vog {
 static ThemeColors get_default_dark_palette() {
     ThemeColors c;
 
-    c.bg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);        // #141414
-    c.surface = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);   // #0D0D0D
-    c.titlebar = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);  // #262626
+    c.bg = ImVec4(0.08f, 0.08f, 0.08f, 1.0f);      // #141414
+    c.panel0 = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);  // #0D0D0D
+    c.panel1 = ImVec4(0.11f, 0.11f, 0.11f, 1.0f);  // #1C1C1C
+    c.panel2 = ImVec4(0.15f, 0.15f, 0.15f, 1.0f);  // #262626
+    c.panel3 = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);  // #2E2E2E
 
     c.element = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);  // #404040
-
-    c.border = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);         // #404040
-    c.border_subtle = ImVec4(0.05f, 0.05f, 0.05f, 1.0f);  // #0D0D0D
-    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);     // #00000000
+    c.border = ImVec4(0.25f, 0.25f, 0.25f, 1.0f);   // #404040
 
     c.text = ImVec4(0.86f, 0.86f, 0.86f, 1.0f);        // #DBDBDB
     c.text_muted = ImVec4(0.55f, 0.55f, 0.55f, 1.0f);  // #8C8C8C
@@ -28,9 +27,7 @@ static ThemeColors get_default_dark_palette() {
     c.positive = ImVec4(0.40f, 0.74f, 0.40f, 1.0f);  // #66BD66
     c.warning = ImVec4(0.96f, 0.78f, 0.36f, 1.0f);   // #F5C75C
     c.danger = ImVec4(0.85f, 0.30f, 0.30f, 1.0f);    // #D94D4D
-
-    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
-    c.nav_dim = ImVec4(0.8f, 0.8f, 0.8f, 0.20f);  // #CCCCCC33
+    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);         // #00000059
 
     return c;
 }
@@ -38,15 +35,14 @@ static ThemeColors get_default_dark_palette() {
 static ThemeColors get_default_light_palette() {
     ThemeColors c;
 
-    c.bg = ImVec4(0.95f, 0.95f, 0.96f, 1.0f);        // #F2F2F5
-    c.surface = ImVec4(0.98f, 0.98f, 0.99f, 1.0f);   // #FAFAFC
-    c.titlebar = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);  // #EBEBF0
+    c.bg = ImVec4(0.95f, 0.95f, 0.96f, 1.0f);      // #F2F2F5
+    c.panel0 = ImVec4(0.98f, 0.98f, 0.99f, 1.0f);  // #FAFAFC
+    c.panel1 = ImVec4(0.91f, 0.91f, 0.93f, 1.0f);  // #E8E8ED
+    c.panel2 = ImVec4(0.86f, 0.86f, 0.88f, 1.0f);  // #DBDBE0
+    c.panel3 = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);  // #E0E0E6
 
     c.element = ImVec4(0.92f, 0.92f, 0.94f, 1.0f);  // #EBEBF0
-
-    c.border = ImVec4(0.75f, 0.75f, 0.78f, 1.0f);         // #BFBFCC
-    c.border_subtle = ImVec4(0.88f, 0.88f, 0.90f, 1.0f);  // #E0E0E6
-    c.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);     // #00000000
+    c.border = ImVec4(0.75f, 0.75f, 0.78f, 1.0f);   // #BFBFCC
 
     c.text = ImVec4(0.15f, 0.15f, 0.18f, 1.0f);        // #26262E
     c.text_muted = ImVec4(0.45f, 0.45f, 0.48f, 1.0f);  // #73737A
@@ -54,12 +50,10 @@ static ThemeColors get_default_light_palette() {
     c.accent = ImVec4(0.03f, 0.50f, 0.94f, 1.0f);      // #0882F2
     c.selection = ImVec4(0.20f, 0.50f, 0.88f, 0.35f);  // #3380E059
 
-    c.positive = ImVec4(0.28f, 0.68f, 0.35f, 1.0f);  // #47AD59
+    c.positive = ImVec4(0.21f, 0.56f, 0.27f, 1.0f);  // #379046
     c.warning = ImVec4(0.90f, 0.65f, 0.20f, 1.0f);   // #E5A533
     c.danger = ImVec4(0.78f, 0.18f, 0.18f, 1.0f);    // #C72E2E
-
-    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);      // #00000059
-    c.nav_dim = ImVec4(0.2f, 0.2f, 0.2f, 0.20f);  // #33333333
+    c.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.35f);         // #00000059
 
     return c;
 }
@@ -77,27 +71,29 @@ void apply_theme_styling(Theme& theme) {
 
     const ImVec4 nav_highlight{c.text.value().x, c.text.value().y, c.text.value().z, 0.7f};
     const ImVec4 row_bg_alt{c.text.value().x, c.text.value().y, c.text.value().z, 0.04f};
+    const ImVec4 nav_dim{c.text.value().x, c.text.value().y, c.text.value().z, 0.20f};
+    const ImVec4 border_subtle = c.get_hover_color(c.border.value());
 
     auto element_hover = c.get_hover_color(c.element.value());
     auto element_active = c.get_active_color(c.element.value());
     auto accent_active = c.get_active_color(c.element.value());
 
     colors[ImGuiCol_WindowBg] = c.bg.value();
-    colors[ImGuiCol_ChildBg] = c.surface.value();
-    colors[ImGuiCol_PopupBg] = c.surface.value();
+    colors[ImGuiCol_ChildBg] = c.panel1.value();
+    colors[ImGuiCol_PopupBg] = c.panel2.value();
     colors[ImGuiCol_Border] = c.border.value();
-    colors[ImGuiCol_BorderShadow] = c.border_shadow.value();
+    colors[ImGuiCol_BorderShadow] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
 
     colors[ImGuiCol_FrameBg] = c.element.value();
     colors[ImGuiCol_FrameBgHovered] = element_hover;
     colors[ImGuiCol_FrameBgActive] = element_active;
 
-    colors[ImGuiCol_TitleBg] = c.titlebar.value();
-    colors[ImGuiCol_TitleBgActive] = c.surface.value();
-    colors[ImGuiCol_TitleBgCollapsed] = c.titlebar.value();
-    colors[ImGuiCol_MenuBarBg] = c.titlebar.value();
+    colors[ImGuiCol_TitleBg] = c.panel3.value();
+    colors[ImGuiCol_TitleBgActive] = c.panel1.value();
+    colors[ImGuiCol_TitleBgCollapsed] = c.panel3.value();
+    colors[ImGuiCol_MenuBarBg] = c.panel3.value();
 
-    colors[ImGuiCol_ScrollbarBg] = c.surface.value();
+    colors[ImGuiCol_ScrollbarBg] = c.panel0.value();
     colors[ImGuiCol_ScrollbarGrab] = c.element.value();
     colors[ImGuiCol_ScrollbarGrabHovered] = element_hover;
     colors[ImGuiCol_ScrollbarGrabActive] = element_active;
@@ -135,7 +131,7 @@ void apply_theme_styling(Theme& theme) {
 
     colors[ImGuiCol_TableHeaderBg] = c.element.value();
     colors[ImGuiCol_TableBorderStrong] = c.border.value();
-    colors[ImGuiCol_TableBorderLight] = c.border_subtle.value();
+    colors[ImGuiCol_TableBorderLight] = border_subtle;
     colors[ImGuiCol_TableRowBg] = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     colors[ImGuiCol_TableRowBgAlt] = row_bg_alt;
 
@@ -147,7 +143,7 @@ void apply_theme_styling(Theme& theme) {
 
     colors[ImGuiCol_NavHighlight] = c.accent.value();
     colors[ImGuiCol_NavWindowingHighlight] = nav_highlight;
-    colors[ImGuiCol_NavWindowingDimBg] = c.nav_dim.value();
+    colors[ImGuiCol_NavWindowingDimBg] = nav_dim;
     colors[ImGuiCol_ModalWindowDimBg] = c.dim.value();
 
     // Rounding
@@ -188,12 +184,12 @@ void Window::SetTheme(const Theme& theme) {
     auto& rc = resolved.colors;
     const auto& uc = theme.colors;
     rc.bg = uc.bg.has_value() ? uc.bg : defaults.bg;
-    rc.surface = uc.surface.has_value() ? uc.surface : defaults.surface;
-    rc.titlebar = uc.titlebar.has_value() ? uc.titlebar : defaults.titlebar;
+    rc.panel0 = uc.panel0.has_value() ? uc.panel0 : defaults.panel0;
+    rc.panel1 = uc.panel1.has_value() ? uc.panel1 : defaults.panel1;
+    rc.panel2 = uc.panel2.has_value() ? uc.panel2 : defaults.panel2;
+    rc.panel3 = uc.panel3.has_value() ? uc.panel3 : defaults.panel3;
     rc.element = uc.element.has_value() ? uc.element : defaults.element;
     rc.border = uc.border.has_value() ? uc.border : defaults.border;
-    rc.border_subtle = uc.border_subtle.has_value() ? uc.border_subtle : defaults.border_subtle;
-    rc.border_shadow = uc.border_shadow.has_value() ? uc.border_shadow : defaults.border_shadow;
     rc.text = uc.text.has_value() ? uc.text : defaults.text;
     rc.text_muted = uc.text_muted.has_value() ? uc.text_muted : defaults.text_muted;
     rc.accent = uc.accent.has_value() ? uc.accent : defaults.accent;
@@ -202,7 +198,6 @@ void Window::SetTheme(const Theme& theme) {
     rc.warning = uc.warning.has_value() ? uc.warning : defaults.warning;
     rc.danger = uc.danger.has_value() ? uc.danger : defaults.danger;
     rc.dim = uc.dim.has_value() ? uc.dim : defaults.dim;
-    rc.nav_dim = uc.nav_dim.has_value() ? uc.nav_dim : defaults.nav_dim;
 
     auto& rv = resolved.vars;
     const auto& uv = theme.vars;

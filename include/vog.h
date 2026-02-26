@@ -37,17 +37,20 @@ struct ThemeVars {
 // passed to WindowConfig::theme or SetTheme().
 struct ThemeColors {
     // Backgrounds
-    std::optional<ImVec4> bg;        // app / window background
-    std::optional<ImVec4> surface;   // elevated surface: panels, popups, child windows
-    std::optional<ImVec4> titlebar;  // titlebar and menubar background
+    std::optional<ImVec4> bg;  // app / window background
+
+    // Panel surface hierarchy
+    // panel0 should be closest to the bg color.
+    std::optional<ImVec4> panel0;
+    std::optional<ImVec4> panel1;
+    std::optional<ImVec4> panel2;
+    std::optional<ImVec4> panel3;
 
     // Interactive element states
     std::optional<ImVec4> element;  // default state of input elements
 
     // Borders
-    std::optional<ImVec4> border;         // primary borders and dividers
-    std::optional<ImVec4> border_subtle;  // inner / light borders (table cell lines, etc.)
-    std::optional<ImVec4> border_shadow;  // drop-shadow tint (transparent in most themes)
+    std::optional<ImVec4> border;  // primary borders and dividers
 
     // Text
     std::optional<ImVec4> text;        // primary readable text
@@ -63,8 +66,7 @@ struct ThemeColors {
     std::optional<ImVec4> danger;    // errors, critical status, delete actions
 
     // Overlays
-    std::optional<ImVec4> dim;      // modal / full-screen dim scrim
-    std::optional<ImVec4> nav_dim;  // Ctrl+Tab nav-windowing background dim
+    std::optional<ImVec4> dim;  // modal / full-screen dim
 
    private:
     static bool is_dark_color(const ImVec4& color) {

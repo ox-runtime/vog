@@ -38,12 +38,10 @@ static vog::Theme make_custom_theme() {
     vog::Theme t;
 
     t.colors.bg = ImVec4(0.06f, 0.07f, 0.14f, 1.0f);
-    t.colors.surface = ImVec4(0.10f, 0.11f, 0.20f, 1.0f);
-    t.colors.titlebar = ImVec4(0.08f, 0.09f, 0.17f, 1.0f);
+    t.colors.panel1 = ImVec4(0.10f, 0.11f, 0.20f, 1.0f);
+    t.colors.panel3 = ImVec4(0.08f, 0.09f, 0.17f, 1.0f);
     t.colors.element = ImVec4(0.18f, 0.20f, 0.35f, 1.0f);
     t.colors.border = ImVec4(0.28f, 0.31f, 0.52f, 1.0f);
-    t.colors.border_subtle = ImVec4(0.14f, 0.15f, 0.27f, 1.0f);
-    t.colors.border_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.0f);
     t.colors.text = ImVec4(0.92f, 0.93f, 1.00f, 1.0f);
     t.colors.text_muted = ImVec4(0.55f, 0.58f, 0.80f, 1.0f);
     t.colors.accent = ImVec4(0.56f, 0.40f, 0.96f, 1.0f);
@@ -52,7 +50,6 @@ static vog::Theme make_custom_theme() {
     t.colors.warning = ImVec4(0.98f, 0.76f, 0.26f, 1.0f);
     t.colors.danger = ImVec4(0.95f, 0.35f, 0.35f, 1.0f);
     t.colors.dim = ImVec4(0.0f, 0.0f, 0.0f, 0.45f);
-    t.colors.nav_dim = ImVec4(0.5f, 0.5f, 0.8f, 0.15f);
 
     return t;
 }
@@ -207,14 +204,14 @@ static void RenderFrame(DemoState& s) {
 
             vog::ThemeColors editable_colors = vog::Window::GetTheme().colors;
             std::optional<ImVec4>* color_ptrs[] = {
-                &editable_colors.bg,         &editable_colors.surface, &editable_colors.titlebar,
+                &editable_colors.bg,         &editable_colors.panel1,  &editable_colors.panel3,
                 &editable_colors.element,    &editable_colors.border,  &editable_colors.text,
                 &editable_colors.text_muted, &editable_colors.accent,  &editable_colors.selection,
                 &editable_colors.positive,   &editable_colors.warning, &editable_colors.danger,
             };
 
-            const char* names[] = {"bg",         "surface", "titlebar",  "element",  "border",  "text",
-                                   "text_muted", "accent",  "selection", "positive", "warning", "danger"};
+            const char* names[] = {"bg",         "panel1", "panel3",    "element",  "border",  "text",
+                                   "text_muted", "accent", "selection", "positive", "warning", "danger"};
 
             int col = 0;
             for (int i = 0; i < 12; ++i) {
