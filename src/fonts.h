@@ -63,6 +63,28 @@ void Window::setup_fonts() {
         io.FontDefault = io.Fonts->AddFontDefault();
     }
 
+    // Platform-specific FontGlobalScale rationale:
+    //
+    // macOS (Retina):
+    //   GLFW uses SCALE_FRAMEBUFFER — the framebuffer is `content_scale` times larger
+    //   than the logical window.  io.DisplayFramebufferScale = (scale, scale)
+    //   and io.DisplaySize is in *logical* points.  Loading the font at
+    //   size*scale produces a sharp hi-res atlas, but ImGui's glyph metrics
+    //   are `scale` times too large in logical space.  FontGlobalScale = 1/scale
+    //   restores the correct logical size without losing sharpness.
+    //
+    // Windows / Linux (DPI scale):
+    //   GLFW uses SCALE_TO_MONITOR — the window itself is enlarged so
+    //   io.DisplayFramebufferScale = (1, 1) and io.DisplaySize == physical
+    //   pixels.  Loading at size*scale and rendering at size*scale physical
+    //   pixels is already the correct DPI-aware size; FontGlobalScale must
+    //   remain 1.0 or the font will appear smaller than intended.
+#ifdef __APPLE__
+    io.FontGlobalScale = 1.0f / last_content_scale_;
+#else
+    io.FontGlobalScale = 1.0f;
+#endif
+
     // Merge Font Awesome icons
     ImFontConfig config;
     config.MergeMode = true;
