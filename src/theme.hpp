@@ -1,3 +1,6 @@
+// Internal header — not part of the public API.
+#pragma once
+
 #include "imgui.h"
 #include "platform.h"
 #include "vog.h"

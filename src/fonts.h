@@ -17,9 +17,13 @@ namespace vog {
 // Returns a platform-appropriate Arial-like font path.
 inline std::string GetFontPath() {
 #ifdef _WIN32
-    return "C:/Windows/Fonts/arial.ttf";
+    const char* path = "C:/Windows/Fonts/arial.ttf";
+    if (std::filesystem::exists(path)) return path;
+    return "";
 #elif defined(__APPLE__)
-    return "/System/Library/Fonts/Helvetica.ttc";
+    const char* path = "/System/Library/Fonts/Helvetica.ttc";
+    if (std::filesystem::exists(path)) return path;
+    return "";
 #elif defined(__linux__)
     const char* paths[] = {
         "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",

@@ -58,7 +58,7 @@ static vog::Theme make_custom_theme() {
 // Helpers
 // ---------------------------------------------------------------------------
 static void ColorSwatch(const char* label, std::optional<ImVec4>& col) {
-    ImGui::ColorEdit4(label, (float*)&col.value(), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+    ImGui::ColorEdit4(label, reinterpret_cast<float*>(&col.value()), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
     ImGui::SameLine();
     ImGui::TextUnformatted(label);
 }

@@ -161,7 +161,7 @@ void Window::RenderFrameNow() {
         ImGui::SetNextWindowSize(io.DisplaySize);
         ImGuiWindowFlags host_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
                                       ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoBringToFrontOnFocus |
-                                      ImGuiWindowFlags_NoBringToFrontOnFocus;
+                                      ImGuiWindowFlags_NoScrollWithMouse;
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, theme_vars.window_padding.value());
         ImGui::Begin("##host", nullptr, host_flags);
@@ -184,7 +184,7 @@ void Window::RenderFrameNow() {
     glfwSwapBuffers(window_);
 }
 
-inline float getContentScale(GLFWwindow* window) {
+static float getContentScale(GLFWwindow* window) {
     float xs, ys;
     glfwGetWindowContentScale(window, &xs, &ys);
     return (xs + ys) * 0.5f;

@@ -39,7 +39,7 @@ void apply_dark_titlebar(GLFWwindow* window, bool dark) {
         Atom utf8_string = XInternAtom(display, "UTF8_STRING", False);
         const char* variant = dark ? "dark" : "light";
         XChangeProperty(display, x11_window, gtk_theme_variant, utf8_string, 8, PropModeReplace,
-                        reinterpret_cast<const unsigned char*>(variant), strlen(variant));
+                        reinterpret_cast<const unsigned char*>(variant), static_cast<int>(strlen(variant)));
         XFlush(display);
     }
 }
