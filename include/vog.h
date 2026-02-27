@@ -14,7 +14,9 @@
 #include "IconsFontAwesome6.h"
 #include "imgui.h"
 
+#ifdef _WIN32
 #define NOMINMAX
+#endif
 
 struct GLFWwindow;
 
@@ -77,8 +79,8 @@ struct ThemeColors {
 
     static ImVec4 adjust_brightness(const ImVec4& color, const ImVec4& bg, float amount) {
         amount *= is_dark_color(bg) ? -1 : 1;
-        return ImVec4(std::min(color.x + amount, 1.0f), std::min(color.y + amount, 1.0f),
-                      std::min(color.z + amount, 1.0f), color.w);
+        return ImVec4(std::clamp(color.x + amount, 0.0f, 1.0f), std::clamp(color.y + amount, 0.0f, 1.0f),
+                      std::clamp(color.z + amount, 0.0f, 1.0f), color.w);
     }
 
    public:
