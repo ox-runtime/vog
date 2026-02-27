@@ -24,6 +24,10 @@ if(UNIX AND NOT APPLE)
 endif()
 FetchContent_MakeAvailable(glfw)
 
+if(UNIX AND NOT APPLE)
+    set_target_properties(glfw PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
+
 # Dear ImGui
 FetchContent_Declare(imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -56,6 +60,10 @@ if(APPLE)
 endif()
 
 add_library(vog STATIC ${VOG_SOURCES})
+
+if(UNIX AND NOT APPLE)
+    set_target_properties(vog PROPERTIES POSITION_INDEPENDENT_CODE ON)
+endif()
 
 target_include_directories(vog PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
