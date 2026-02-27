@@ -115,6 +115,58 @@ if (ImGui::Button(ICON_FA_COPY " Copy")) { ... }
 | `vog::widgets::ShowItemTooltip(text)` | Tooltip anchored below the previous item |
 | `vog::widgets::Button(text, textColor, bgColor)` | Button with optional text color and background color |
 
+## Linux dependencies
+
+On Linux, vog uses the **X11** backend of GLFW by default. Install the required development packages before configuring:
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get install \
+    libx11-dev libxrandr-dev libxinerama-dev \
+    libxcursor-dev libxi-dev libxext-dev \
+    libgl1-mesa-dev
+```
+
+**Fedora / RHEL:**
+```bash
+sudo dnf install \
+    libX11-devel libXrandr-devel libXinerama-devel \
+    libXcursor-devel libXi-devel libXext-devel \
+    mesa-libGL-devel
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S libx11 libxrandr libxinerama libxcursor libxi libxext mesa
+```
+
+### Wayland support
+
+Wayland support is **opt-in** and disabled by default. Enable it by passing `-DVOG_WAYLAND=ON` to CMake:
+
+```bash
+cmake -B build -DVOG_WAYLAND=ON
+```
+
+This requires additional packages:
+
+**Ubuntu / Debian:**
+```bash
+sudo apt-get install libwayland-dev wayland-protocols libxkbcommon-dev
+```
+
+**Fedora / RHEL:**
+```bash
+sudo dnf install wayland-devel wayland-protocols-devel libxkbcommon-devel
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S wayland wayland-protocols libxkbcommon
+```
+
+> **Note:** When `VOG_WAYLAND=OFF` (the default), vog builds fine on X11-only systems and on Wayland compositors that provide XWayland. Enable `VOG_WAYLAND=ON` only if you need native Wayland windows.
+
 ## Building the example
 
 The demo window showcases controls, status indicators, an animated plot, the theme switcher, and platform info. It is off by default; enable it with `VOG_BUILD_EXAMPLES`:

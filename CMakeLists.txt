@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.15)
 project(vog VERSION 1.1.5 LANGUAGES CXX)
 
 option(VOG_BUILD_EXAMPLES "Build vog example applications" OFF)
+option(VOG_WAYLAND "Build with Wayland support (requires wayland-scanner and wayland-protocols dev packages)" OFF)
 
 include(FetchContent)
 
@@ -13,6 +14,14 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
+if(UNIX AND NOT APPLE)
+    if(VOG_WAYLAND)
+        set(GLFW_BUILD_WAYLAND ON CACHE BOOL "" FORCE)
+    else()
+        set(GLFW_BUILD_WAYLAND OFF CACHE BOOL "" FORCE)
+    endif()
+    set(GLFW_BUILD_X11 ON CACHE BOOL "" FORCE)
+endif()
 FetchContent_MakeAvailable(glfw)
 
 # Dear ImGui
