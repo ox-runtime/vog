@@ -5,6 +5,7 @@
 // Single include for everything. ImGui is included automatically so callers
 // only need: #include "vog.h"
 
+#include <algorithm>
 #include <atomic>
 #include <functional>
 #include <optional>
