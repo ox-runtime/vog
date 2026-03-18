@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.27)
 project(vog_examples)
 
 add_executable(vog_demo demo_window.cpp)
