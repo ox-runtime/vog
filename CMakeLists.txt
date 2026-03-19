@@ -81,7 +81,6 @@ target_link_libraries(vog PUBLIC glfw OpenGL::GL)
 
 if(WIN32)
     target_link_libraries(vog PUBLIC dwmapi)
-    target_compile_definitions(vog PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX)
 elseif(APPLE)
     find_library(COCOA_LIBRARY Cocoa REQUIRED)
     find_library(IOKIT_LIBRARY IOKit REQUIRED)

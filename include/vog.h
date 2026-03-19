@@ -15,6 +15,10 @@
 #include "IconsFontAwesome6.h"
 #include "imgui.h"
 
+#ifdef _WIN32
+#define NOMINMAX
+#endif
+
 struct GLFWwindow;
 
 // ---------------------------------------------------------------------------
