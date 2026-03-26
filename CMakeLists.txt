@@ -65,6 +65,10 @@ if(UNIX AND NOT APPLE)
     set_target_properties(vog PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
+if(APPLE)
+    target_compile_definitions(vog PRIVATE GL_SILENCE_DEPRECATION)
+endif()
+
 target_include_directories(vog PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/third_party
