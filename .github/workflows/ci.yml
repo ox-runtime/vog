@@ -1,0 +1,227 @@
+name: ci
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  build-demo:
+    name: ${{ matrix.asset_basename }}
+    runs-on: ${{ matrix.runs_on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runs_on: windows-latest
+            asset_basename: vog-demo-win-x64
+            target_os: windows
+            target_arch: x86_64
+            build_dir: build/vog-win-x64
+            executable_relpath: bin/vog_demo.exe
+            app_exec: vog_demo.exe
+          - runs_on: ubuntu-24.04
+            asset_basename: vog-demo-linux-x64
+            target_os: linux
+            target_arch: x86_64
+            build_dir: build/vog-linux-x64
+            executable_relpath: bin/vog_demo
+            app_exec: vog_demo
+          - runs_on: macos-13
+            asset_basename: vog-demo-mac-x64
+            target_os: mac
+            target_arch: x86_64
+            build_dir: build/vog-mac-x64
+            executable_relpath: bin/vog_demo
+            app_exec: vog_demo
+            cmake_osx_architectures: x86_64
+            cmake_osx_deployment_target: "10.14"
+          - runs_on: macos-14
+            asset_basename: vog-demo-mac-arm64
+            target_os: mac
+            target_arch: arm64
+            build_dir: build/vog-mac-arm64
+            executable_relpath: bin/vog_demo
+            app_exec: vog_demo
+            cmake_osx_architectures: arm64
+            cmake_osx_deployment_target: "11.0"
+
+    env:
+      APP_NAME: vog-demo
+      STAGE_DIR: dist/stage/${{ matrix.asset_basename }}
+      ARTIFACT_DIR: dist/packages/${{ matrix.asset_basename }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Derive application version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_EVENT_NAME}" == "release" ]]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version="0.0.0-${GITHUB_RUN_NUMBER}"
+          fi
+          echo "APP_VERSION=${version}" >> "$GITHUB_ENV"
+
+      - name: Import Apple code signing certificate
+        if: runner.os == 'macOS'
+        env:
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+        run: |
+          printf '%s' "${{ secrets.MAC_CERTIFICATE_P12_BASE64 }}" | base64 --decode > app-cert.p12
+          openssl pkcs12 -in app-cert.p12 -passin env:MAC_CERTIFICATE_PASSWORD -noout >/dev/null
+          openssl pkcs12 -in app-cert.p12 -passin env:MAC_CERTIFICATE_PASSWORD -nodes -out app-cert.pem
+          openssl pkcs12 -export -in app-cert.pem -out app-cert-compat.p12 \
+            -passout env:MAC_CERTIFICATE_PASSWORD \
+            -keypbe PBE-SHA1-3DES \
+            -certpbe PBE-SHA1-3DES \
+            -macalg sha1
+          security create-keychain -p "$RUNNER_TEMP" build.keychain
+          security unlock-keychain -p "$RUNNER_TEMP" build.keychain
+          security default-keychain -s build.keychain
+          security import app-cert-compat.p12 -k build.keychain -P "$MAC_CERTIFICATE_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$RUNNER_TEMP" build.keychain
+          security list-keychains -d user -s build.keychain
+
+      - name: Install EasyInstaller
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          git clone --depth 1 https://github.com/cmdr2/easyinstaller.git easyinstaller-src
+          python -m pip install ./easyinstaller-src
+
+      - name: Install Windows packaging tools
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install nsis -y --no-progress
+          "${env:ProgramFiles(x86)}\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Install Linux build and packaging tools
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            flatpak \
+            flatpak-builder \
+            libgl1-mesa-dev \
+            libx11-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libxinerama-dev \
+            libxext-dev \
+            libxrandr-dev \
+            squashfs-tools
+          sudo snap install snapcraft --classic
+          sudo snap install core24
+          curl -L https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -o appimagetool
+          chmod +x appimagetool
+          sudo mv appimagetool /usr/local/bin/appimagetool
+
+      - name: Configure vog demo on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cmake -S vog -B "${{ matrix.build_dir }}" -A x64 -DVOG_BUILD_EXAMPLES=ON
+
+      - name: Configure vog demo on Linux and macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cmake_args=(
+            -S vog
+            -B "${{ matrix.build_dir }}"
+            -DCMAKE_BUILD_TYPE=Release
+            -DVOG_BUILD_EXAMPLES=ON
+          )
+          if [[ "$RUNNER_OS" == "macOS" ]]; then
+            cmake_args+=(
+              -DCMAKE_OSX_ARCHITECTURES=${{ matrix.cmake_osx_architectures }}
+              -DCMAKE_OSX_DEPLOYMENT_TARGET=${{ matrix.cmake_osx_deployment_target }}
+            )
+          fi
+          cmake "${cmake_args[@]}"
+
+      - name: Build vog demo on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cmake --build "${{ matrix.build_dir }}" --config Release --target vog_demo
+
+      - name: Build vog demo on Linux and macOS
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cmake --build "${{ matrix.build_dir }}" --target vog_demo --parallel
+
+      - name: Stage Windows package contents
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "${env:STAGE_DIR}" | Out-Null
+          New-Item -ItemType Directory -Force -Path "${env:ARTIFACT_DIR}" | Out-Null
+          Copy-Item "${{ matrix.build_dir }}\${{ matrix.executable_relpath }}" (Join-Path "${env:STAGE_DIR}" "vog_demo.exe")
+
+      - name: Stage Linux and macOS package contents
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p "$STAGE_DIR" "$ARTIFACT_DIR"
+          cp "${{ matrix.build_dir }}/${{ matrix.executable_relpath }}" "$STAGE_DIR/vog_demo"
+          chmod +x "$STAGE_DIR/vog_demo"
+
+      - name: Package Windows outputs
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $outputBase = Join-Path "${env:ARTIFACT_DIR}" "${{ matrix.asset_basename }}"
+          easyinstaller --source "${env:STAGE_DIR}" --os windows --arch ${{ matrix.target_arch }} --type zip --output "$outputBase"
+          easyinstaller --source "${env:STAGE_DIR}" --os windows --arch ${{ matrix.target_arch }} --type nsis --output "$outputBase" --app-name "${env:APP_NAME}" --app-version "${env:APP_VERSION}" --app-exec "${{ matrix.app_exec }}"
+
+      - name: Package Linux outputs
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type zip --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}"
+          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type appimage --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-exec "${{ matrix.app_exec }}"
+          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type flatpak --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-exec "${{ matrix.app_exec }}"
+          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type snap --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-description "vog demo" --app-exec "${{ matrix.app_exec }}"
+
+      - name: Package macOS outputs
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          easyinstaller --source "$STAGE_DIR" --os mac --arch ${{ matrix.target_arch }} --type app-in-dmg \
+            --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" \
+            --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-exec "${{ matrix.app_exec }}" \
+            --mac-notarize \
+            --mac-notary-team-name "${{ secrets.MAC_NOTARY_TEAM_NAME }}" \
+            --mac-notary-apple-id "${{ secrets.MAC_NOTARY_APPLE_ID }}" \
+            --mac-notary-team-id "${{ secrets.MAC_NOTARY_TEAM_ID }}" \
+            --mac-notary-password "${{ secrets.MAC_NOTARY_PASSWORD }}"
+
+      - name: Upload release assets
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          shopt -s nullglob
+          files=("$ARTIFACT_DIR"/*)
+          if (( ${#files[@]} == 0 )); then
+            echo "No packaged files found in $ARTIFACT_DIR"
+            exit 1
+          fi
+          gh release upload "${{ github.event.release.tag_name }}" "${files[@]}" --clobber
