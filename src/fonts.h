@@ -48,9 +48,6 @@ void Window::setup_fonts() {
 
     float globalFontSize = GetTheme().vars.font_size.value();
     float fontSize = globalFontSize * last_content_scale_;
-#ifdef __APPLE__
-    fontSize *= (72.0f / 96.0f);  // macOS uses 72 DPI as the default, while Windows and Linux typically use 96 DPI
-#endif
 
     ImFont* default_font = nullptr;
     if (!font_path.empty()) {
