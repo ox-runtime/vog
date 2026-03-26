@@ -3,7 +3,7 @@
 
 #include <GLFW/glfw3.h>
 
-#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 
@@ -35,7 +35,7 @@ inline std::string GetFontPath() {
     const char* paths[] = {};
 #endif
     for (const char* p : paths) {
-        if (std::filesystem::exists(p)) return p;
+        if (std::ifstream(p).good()) return p;
     }
     return "";
 }
