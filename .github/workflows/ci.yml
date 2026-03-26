@@ -187,16 +187,12 @@ jobs:
         run: |
           $outputBase = Join-Path "${env:ARTIFACT_DIR}" "${{ matrix.asset_basename }}"
           easyinstaller --source "${env:STAGE_DIR}" --os windows --arch ${{ matrix.target_arch }} --type zip --output "$outputBase"
-          easyinstaller --source "${env:STAGE_DIR}" --os windows --arch ${{ matrix.target_arch }} --type nsis --output "$outputBase" --app-name "${env:APP_NAME}" --app-version "${env:APP_VERSION}" --app-exec "${{ matrix.app_exec }}"
 
       - name: Package Linux outputs
         if: runner.os == 'Linux'
         shell: bash
         run: |
           easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type zip --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}"
-          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type appimage --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-exec "${{ matrix.app_exec }}"
-          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type flatpak --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-exec "${{ matrix.app_exec }}"
-          easyinstaller --source "$STAGE_DIR" --os linux --arch ${{ matrix.target_arch }} --type snap --output "$ARTIFACT_DIR/${{ matrix.asset_basename }}" --app-name "$APP_NAME" --app-version "$APP_VERSION" --app-description "vog demo" --app-exec "${{ matrix.app_exec }}"
 
       - name: Package macOS outputs
         if: runner.os == 'macOS'
