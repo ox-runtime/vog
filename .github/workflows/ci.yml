@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   workflow_dispatch:
@@ -31,7 +31,7 @@ jobs:
             build_dir: build/vog-linux-x64
             executable_relpath: bin/vog_demo
             app_exec: vog_demo
-          - runs_on: macos-13
+          - runs_on: macos-latest
             asset_basename: vog-demo-mac-x64
             target_os: mac
             target_arch: x86_64
@@ -40,7 +40,7 @@ jobs:
             app_exec: vog_demo
             cmake_osx_architectures: x86_64
             cmake_osx_deployment_target: "10.14"
-          - runs_on: macos-14
+          - runs_on: macos-latest
             asset_basename: vog-demo-mac-arm64
             target_os: mac
             target_arch: arm64
@@ -134,14 +134,13 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          cmake -S vog -B "${{ matrix.build_dir }}" -A x64 -DVOG_BUILD_EXAMPLES=ON
+          cmake -B "${{ matrix.build_dir }}" -A x64 -DVOG_BUILD_EXAMPLES=ON
 
       - name: Configure vog demo on Linux and macOS
         if: runner.os != 'Windows'
         shell: bash
         run: |
           cmake_args=(
-            -S vog
             -B "${{ matrix.build_dir }}"
             -DCMAKE_BUILD_TYPE=Release
             -DVOG_BUILD_EXAMPLES=ON
