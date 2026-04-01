@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.15...3.25)
-project(vog VERSION 1.1.10 LANGUAGES CXX)
+project(vog VERSION 1.1.11 LANGUAGES CXX)
 
 if(APPLE)
     enable_language(OBJCXX)
