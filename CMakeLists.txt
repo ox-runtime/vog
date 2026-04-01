@@ -32,6 +32,12 @@ if(UNIX AND NOT APPLE)
     set_target_properties(glfw PROPERTIES POSITION_INDEPENDENT_CODE ON)
 endif()
 
+# AppleClang 17 (Xcode 16.4+) treats implicit void* -> pointer/function-pointer
+# conversions in GLFW 3.4's cocoa_init.m as hard errors.
+if(APPLE)
+    target_compile_options(glfw PRIVATE -Wno-incompatible-pointer-types)
+endif()
+
 # Dear ImGui
 FetchContent_Declare(imgui
     GIT_REPOSITORY https://github.com/ocornut/imgui.git
@@ -60,7 +66,7 @@ set(VOG_SOURCES
 if(APPLE)
     list(APPEND VOG_SOURCES src/platform_macos.mm)
     set_source_files_properties(src/platform_macos.mm PROPERTIES
-        COMPILE_FLAGS "-x objective-c++")
+        LANGUAGE OBJCXX)
 endif()
 
 add_library(vog STATIC ${VOG_SOURCES})
