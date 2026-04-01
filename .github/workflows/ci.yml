@@ -101,36 +101,19 @@ jobs:
           git clone --depth 1 https://github.com/cmdr2/easyinstaller.git easyinstaller-src
           python -m pip install ./easyinstaller-src
 
-      - name: Install Windows packaging tools
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          nsis_zip="$RUNNER_TEMP/nsis.zip"
-          curl -L 'https://sourceforge.net/projects/nsisbi/files/nsisbi3.10.3/nsis-binary-7423-3.zip/download' -o "$nsis_zip"
-          unzip -q "$nsis_zip" -d "$RUNNER_TEMP"
-          echo "$RUNNER_TEMP/nsis-binary-7423-3" >> "$GITHUB_PATH"
-
       - name: Install Linux build and packaging tools
         if: runner.os == 'Linux'
         shell: bash
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            flatpak \
-            flatpak-builder \
             libgl1-mesa-dev \
             libx11-dev \
             libxcursor-dev \
             libxi-dev \
             libxinerama-dev \
             libxext-dev \
-            libxrandr-dev \
-            squashfs-tools
-          sudo snap install snapcraft --classic
-          sudo snap install core24
-          curl -L https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage -o appimagetool
-          chmod +x appimagetool
-          sudo mv appimagetool /usr/local/bin/appimagetool
+            libxrandr-dev
 
       - name: Configure vog demo on Windows
         if: runner.os == 'Windows'
