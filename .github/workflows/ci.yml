@@ -105,8 +105,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          choco install nsis -y --no-progress
-          "${env:ProgramFiles(x86)}\NSIS" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          nsis_zip="$RUNNER_TEMP/nsis.zip"
+          curl -L 'https://sourceforge.net/projects/nsisbi/files/nsisbi3.10.3/nsis-binary-7423-3.zip/download' -o "$nsis_zip"
+          unzip -q "$nsis_zip" -d "$RUNNER_TEMP"
+          echo "$RUNNER_TEMP/nsis-binary-7423-3" >> "$GITHUB_PATH"
 
       - name: Install Linux build and packaging tools
         if: runner.os == 'Linux'
